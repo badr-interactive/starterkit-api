@@ -2,11 +2,8 @@
 
 describe('Auth Controller', function() {
     given('request', function() {
-        $environment = \Slim\Http\Environment::mock([]);
+        $environment = \Slim\Http\Environment::mock(['CONTENT_TYPE' => 'application/json']);
         $request = \Slim\Http\Request::createFromEnvironment($environment);
-        $requestBody = $request->getBody();
-        $requestBody->write(json_encode(['name' => 'salman']));
-        $request->withBody($requestBody);
 
         return $request;
     });
@@ -14,8 +11,19 @@ describe('Auth Controller', function() {
     given('response', function() {
         return new \Slim\Http\Response();
     });
-    
-    describe('register()', function() {
+
+    describe('register() function', function() {
+        it('should return HTTP Code 400 for invalid Content-Type', function() {
+            $env = \Slim\Http\Environment::mock(['CONTENT_TYPE' => 'application/text']);
+            $request = \Slim\Http\Request::createFromEnvironment($env);
+
+            $app = new \App\Modules\Auth\AuthController();
+            $result = $app->register($request, $this->response);
+            $resultBody = json_decode((string) $result->getBody());
+            expect($result->getStatusCode())->toBe(400);
+            expect($resultBody->success)->toBe(false);
+        });
+        
         it('should returns valid json string', function() {
             $app = new \App\Modules\Auth\AuthController();
             $result = $app->register($this->request, $this->response);
@@ -25,12 +33,20 @@ describe('Auth Controller', function() {
             expect(json_last_error() == JSON_ERROR_NONE)->toBe(true);
         });
 
-        it('should returns HTTP Code 200', function() {
+        it('should returns HTTP Code 200 when success', function() {
             $app = new \App\Modules\Auth\AuthController();
             $result = $app->register($this->request, $this->response);
-            json_decode((string)$result->getBody());
 
             expect($result->getStatusCode())->toBe(200);
+        });
+
+        it('should return success true', function() {
+            $app = new \App\Modules\Auth\AuthController();
+            $result = $app->register($this->request, $this->response);
+            
+
+            $resultJson = json_decode((string) $result->getBody());
+            expect($resultJson->success)->toBe(true);
         });
     });
 });
