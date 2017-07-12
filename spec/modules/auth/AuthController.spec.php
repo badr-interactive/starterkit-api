@@ -5,6 +5,16 @@ describe('Auth Controller', function() {
         $environment = \Slim\Http\Environment::mock(['CONTENT_TYPE' => 'application/json']);
         $request = \Slim\Http\Request::createFromEnvironment($environment);
 
+        $data = [
+            'email' => 'me@example.com',
+            'password' => 'secret',
+            'confirmation_password' => 'secret'
+        ];
+
+        $body = $request->getBody();
+        $body->write(json_encode($data));
+        $request->withBody($body);
+
         return $request;
     });
 
@@ -47,6 +57,60 @@ describe('Auth Controller', function() {
 
             $resultJson = json_decode((string) $result->getBody());
             expect($resultJson->success)->toBe(true);
+        });
+
+        it('should check email as required param', function() {
+            $data = [
+                'password' => 'secret',
+                'confirmation_password' => 'secret'
+            ];
+
+            $environment = \Slim\Http\Environment::mock(['CONTENT_TYPE' => 'application/json']);
+            $request = \Slim\Http\Request::createFromEnvironment($environment);
+            $body = $request->getBody();
+            $body->write(json_encode($data));
+            $request->withBody($body);
+
+            $app = new \App\Modules\Auth\AuthController();
+            $result = $app->register($request, $this->response);
+            
+            expect($result->getStatusCode())->toBe(401);
+        });
+
+        it('should check password as required param', function() {
+            $data = [
+                'email' => 'me@example.com',
+                'confirmation_password' => 'secret'
+            ];
+
+            $environment = \Slim\Http\Environment::mock(['CONTENT_TYPE' => 'application/json']);
+            $request = \Slim\Http\Request::createFromEnvironment($environment);
+            $body = $request->getBody();
+            $body->write(json_encode($data));
+            $request->withBody($body);
+
+            $app = new \App\Modules\Auth\AuthController();
+            $result = $app->register($request, $this->response);
+            
+            expect($result->getStatusCode())->toBe(401);
+        });
+
+        it('should check confirmation_password as required param', function() {
+            $data = [
+                'email' => 'me@example.com',
+                'password' => 'secret'
+            ];
+
+            $environment = \Slim\Http\Environment::mock(['CONTENT_TYPE' => 'application/json']);
+            $request = \Slim\Http\Request::createFromEnvironment($environment);
+            $body = $request->getBody();
+            $body->write(json_encode($data));
+            $request->withBody($body);
+
+            $app = new \App\Modules\Auth\AuthController();
+            $result = $app->register($request, $this->response);
+            
+            expect($result->getStatusCode())->toBe(401);
         });
     });
 });
