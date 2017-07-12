@@ -21,7 +21,12 @@ class AuthController
             return $response->withJson(['success' => false], 401);
         }
 
-        $request->getParam('email');
-        return $response->withJson(['success' => true], 200);
+        $responseData = [
+            'success' => true,
+            'message' => 'user registration success',
+            'data' => null
+        ];
+
+        return $response->withJson($responseData, 200);
     }
 }

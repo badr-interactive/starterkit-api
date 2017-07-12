@@ -33,31 +33,6 @@ describe('Auth Controller', function() {
             expect($result->getStatusCode())->toBe(400);
             expect($resultBody->success)->toBe(false);
         });
-        
-        it('should returns valid json string', function() {
-            $app = new \App\Modules\Auth\AuthController();
-            $result = $app->register($this->request, $this->response);
-            json_decode((string)$result->getBody());
-
-            expect($result->getHeader('Content-Type')[0])->toBe('application/json;charset=utf-8');
-            expect(json_last_error() == JSON_ERROR_NONE)->toBe(true);
-        });
-
-        it('should returns HTTP Code 200 when success', function() {
-            $app = new \App\Modules\Auth\AuthController();
-            $result = $app->register($this->request, $this->response);
-
-            expect($result->getStatusCode())->toBe(200);
-        });
-
-        it('should return success true', function() {
-            $app = new \App\Modules\Auth\AuthController();
-            $result = $app->register($this->request, $this->response);
-            
-
-            $resultJson = json_decode((string) $result->getBody());
-            expect($resultJson->success)->toBe(true);
-        });
 
         it('should check email as required param', function() {
             $data = [
@@ -111,6 +86,49 @@ describe('Auth Controller', function() {
             $result = $app->register($request, $this->response);
             
             expect($result->getStatusCode())->toBe(401);
+        });
+
+        it('should returns valid json string', function() {
+            $app = new \App\Modules\Auth\AuthController();
+            $result = $app->register($this->request, $this->response);
+            json_decode((string)$result->getBody());
+
+            expect($result->getHeader('Content-Type')[0])->toBe('application/json;charset=utf-8');
+            expect(json_last_error() == JSON_ERROR_NONE)->toBe(true);
+        });
+
+        it('should returns HTTP Code 200 when success', function() {
+            $app = new \App\Modules\Auth\AuthController();
+            $result = $app->register($this->request, $this->response);
+
+            expect($result->getStatusCode())->toBe(200);
+        });
+
+        it('should return success true', function() {
+            $app = new \App\Modules\Auth\AuthController();
+            $result = $app->register($this->request, $this->response);
+            
+
+            $resultJson = json_decode((string) $result->getBody());
+            expect($resultJson->success)->toBe(true);
+        });
+
+        it('should return success message', function() {
+            $app = new \App\Modules\Auth\AuthController();
+            $result = $app->register($this->request, $this->response);
+            
+
+            $resultJson = json_decode((string) $result->getBody());
+            expect($resultJson->message)->toBe("user registration success");
+        });
+
+        it('should return data as null', function() {
+            $app = new \App\Modules\Auth\AuthController();
+            $result = $app->register($this->request, $this->response);
+            
+
+            $resultJson = json_decode((string) $result->getBody());
+            expect($resultJson->data)->toBe(null);
         });
     });
 });
