@@ -9,10 +9,10 @@ class AuthController
 {
     public function register(Request $request, Response $response)
     {
-        $contentType = $request->getHeaderLine('Content-Type');
+        /*$contentType = $request->getHeaderLine('Content-Type');
         if($contentType !== 'application/json') {
             return $response->withJson(['success' => false], 400);
-        }
+        }*/
 
         $request->getParam('email');
         return $response->withJson(['success' => true], 200);
