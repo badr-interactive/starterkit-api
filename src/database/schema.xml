@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="bookstore" defaultIdMethod="native">
+  <table name="book" phpName="Book">
+    <!-- column and foreign key definitions go here -->
+  </table>
+  <table name="author" phpName="Author">
+    <!-- column and foreign key definitions go here -->
+  </table>
+  <table name="publisher" phpName="Publisher">
+    <!-- column and foreign key definitions go here -->
+  </table>
+</database>
