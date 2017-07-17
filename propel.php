@@ -1,5 +1,9 @@
 <?php
 
+require_once 'vendor/autoload.php';
+$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv->load();
+
 return [
     'propel' => [
         'database' => [
@@ -13,6 +17,15 @@ return [
                     'attributes' => []
                 ],
             ]
+        ],
+        'paths' => [
+            'schemaDir' => __DIR__.'/src/database',
+            'outputDir' => '%schemaDir%',
+            'phpDir' => '%outputDir%/model',
+            'phpConfDir' => '%outputDir%/config',
+            'sqlDir' => '%outputDir%/sql',
+            'migrationDir' => '%outputDir%/migrations',
+
         ],
         'runtime' => [
             'defaultConnection' => 'localhost',
