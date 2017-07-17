@@ -1,0 +1,46 @@
+#!/usr/bin/env php
+<?php
+
+$command = $argv[1];
+if($command !== 'migrate') {
+    return 0;
+}
+
+if(!file_exists(__DIR__ . '/tmp')) {
+    mkdir(__DIR__ . '/tmp', 0755, true);
+}
+
+$modulesDir = __DIR__ . '/src/modules/';
+$files = scandir($modulesDir);
+foreach($files as $key => $value) {
+    if($value == '.' || $value == '..') {
+        continue;
+    }
+
+    $fullpath = $modulesDir . '/' . $value;
+    
+    if(!is_dir($fullpath)) {
+        continue;
+    }
+
+    if(!is_file($fullpath . '/schema.xml')) {
+        continue;
+    }
+
+    $origin = $fullpath . '/schema.xml';
+    $destination = __DIR__ . '/tmp/' . $value . '.schema.xml';
+    if(!copy($origin, $destination)) {
+        echo "Failed to copy schema.xml file!";
+        return 0;
+    }
+}
+
+print "[Freedom:migrate] Generating SQL File... \n";
+exec(__DIR__ . '/vendor/bin/propel sql:build --schema-dir tmp/');
+
+print "[Freedom:migrate] Generating Database Model... \n";
+exec(__DIR__ . '/vendor/bin/propel model:build --schema-dir tmp/');
+
+print "[Freedom:migrate] Cleaning up...\n";
+exec('rm -rf ' . __DIR__ . '/tmp');
+print "[Freedom:migrate] FINISH!";
