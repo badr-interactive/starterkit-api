@@ -101,6 +101,10 @@ foreach($files as $key => $value) {
     xcopy(realpath($src), realpath($dest));
 }
 
+print "[Freedom:migrate] Migrating models into databse...\n";
+exec('"'.__DIR__ . '/vendor/bin/propel" diff --schema-dir tmp/');
+exec('"'.__DIR__ . '/vendor/bin/propel" migrate');
+
 print "[Freedom:migrate] Cleaning up...\n";
 exec('rm -rf "' . __DIR__ . '/tmp"');
 print "[Freedom:migrate] FINISH!";
