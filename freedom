@@ -80,10 +80,10 @@ foreach($files as $key => $value) {
 }
 
 print "[Freedom:migrate] Generating SQL file... \n";
-exec(__DIR__ . '/vendor/bin/propel sql:build --schema-dir tmp/');
+exec('"'.__DIR__ . '/vendor/bin/propel" sql:build --schema-dir tmp/');
 
 print "[Freedom:migrate] Generating database models... \n";
-exec(__DIR__ . '/vendor/bin/propel model:build --schema-dir tmp/');
+exec('"'.__DIR__ . '/vendor/bin/propel" model:build --schema-dir tmp/');
 
 print "[Freedom:migrate] Copying models into app modules... \n";
 $generatedModelDir = __DIR__ . '/generated-classes/App/Modules';
@@ -102,5 +102,5 @@ foreach($files as $key => $value) {
 }
 
 print "[Freedom:migrate] Cleaning up...\n";
-exec('rm -rf ' . __DIR__ . '/tmp');
+exec('rm -rf "' . __DIR__ . '/tmp"');
 print "[Freedom:migrate] FINISH!";
