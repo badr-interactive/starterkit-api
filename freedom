@@ -106,5 +106,8 @@ exec('"'.__DIR__ . '/vendor/bin/propel" diff --schema-dir tmp/');
 exec('"'.__DIR__ . '/vendor/bin/propel" migrate');
 
 print "[Freedom:migrate] Cleaning up...\n";
+exec('rm -rf "' . __DIR__ . '/generated-classes"');
+exec('rm -rf "' . __DIR__ . '/generated-migrations"');
+exec('rm -rf "' . __DIR__ . '/generated-sql"');
 exec('rm -rf "' . __DIR__ . '/tmp"');
 print "[Freedom:migrate] FINISH!";
