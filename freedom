@@ -85,6 +85,9 @@ exec('"'.__DIR__ . '/vendor/bin/propel" sql:build --schema-dir tmp/');
 print "[Freedom:migrate] Generating database models... \n";
 exec('"'.__DIR__ . '/vendor/bin/propel" model:build --schema-dir tmp/');
 
+print "[Freedom:migrate] Generating connection configuration... \n";
+exec('"'.__DIR__ . '/vendor/bin/propel" config:convert --output-dir src/ --output-file=connection.php');
+
 print "[Freedom:migrate] Copying models into app modules... \n";
 $generatedModelDir = __DIR__ . '/generated-classes/App/Modules';
 $files = scandir($generatedModelDir);
@@ -110,4 +113,5 @@ exec('rm -rf "' . __DIR__ . '/generated-classes"');
 exec('rm -rf "' . __DIR__ . '/generated-migrations"');
 exec('rm -rf "' . __DIR__ . '/generated-sql"');
 exec('rm -rf "' . __DIR__ . '/tmp"');
+exec('composer dump-autoload');
 print "[Freedom:migrate] FINISH!";
