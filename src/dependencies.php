@@ -17,3 +17,25 @@ $container['logger'] = function ($c) {
     $logger->pushHandler(new Monolog\Handler\StreamHandler($settings['path'], $settings['level']));
     return $logger;
 };
+
+
+// module specific deppendencies
+$dir = __DIR__ . '/modules';
+$files = scandir($dir);
+foreach($files as $key => $value) {
+    if($value == '.' || $value == '..') {
+        continue;
+    }
+
+    $fullpath = $dir . '/' . $value;
+    
+    if(!is_dir($fullpath)) {
+        continue;
+    }
+
+    if(!is_file($fullpath . '/dependencies.php')) {
+        continue;
+    }
+
+    require $fullpath . '/dependencies.php';
+}

@@ -5,7 +5,7 @@ $serviceContainer->setAdapterClass('starterkit', 'mysql');
 $manager = new \Propel\Runtime\Connection\ConnectionManagerSingle();
 $manager->setConfiguration(array (
   'classname' => 'Propel\\Runtime\\Connection\\ConnectionWrapper',
-  'dsn' => 'mysql:host=mysql;port=6666;dbname=freedom',
+  'dsn' => 'mysql:host=localhost;port=6666;dbname=freedom',
   'user' => 'root',
   'password' => 's3cr3t',
   'attributes' =>

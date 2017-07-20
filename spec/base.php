@@ -13,13 +13,14 @@ use Slim\Http\Environment;
 * @param array|object|null $requestData the request data
 * @return \Slim\Http\Response
 */
-function runApp($requestMethod, $requestUri, $withMiddleware = true, $requestData = null)
+function runApp($requestMethod, $requestUri, $requestData = null, $withMiddleware = true)
 {
     // Create a mock environment for testing with
     $environment = Environment::mock(
         [
             'REQUEST_METHOD' => $requestMethod,
-            'REQUEST_URI' => $requestUri
+            'REQUEST_URI' => $requestUri,
+            'CONTENT_TYPE' => 'application/json'
         ]
     );
 
@@ -28,7 +29,9 @@ function runApp($requestMethod, $requestUri, $withMiddleware = true, $requestDat
 
     // Add request data, if it exists
     if (isset($requestData)) {
-        $request = $request->withBody($requestData);
+        $body = $request->getBody();
+        $body->write($requestData);
+        $request = $request->withBody($body);
     }
 
     // Set up a response object

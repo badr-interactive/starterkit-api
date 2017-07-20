@@ -1,5 +1,5 @@
 <?php
-$app = new \Slim\App();
+
 $dir = __DIR__ . '/modules';
 $files = scandir($dir);
 foreach($files as $key => $value) {
