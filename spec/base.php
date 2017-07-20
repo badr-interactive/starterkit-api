@@ -1,6 +1,7 @@
 <?php
 
 use Slim\App;
+use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\Environment;
@@ -13,8 +14,10 @@ use Slim\Http\Environment;
 * @param array|object|null $requestData the request data
 * @return \Slim\Http\Response
 */
-function runApp($requestMethod, $requestUri, $requestData = null, $withMiddleware = true)
+function runApp($requestMethod, $requestUri, $requestData = null, $dependencies = [])
 {
+    $withMiddleware = true;
+
     // Create a mock environment for testing with
     $environment = Environment::mock(
         [
@@ -39,12 +42,22 @@ function runApp($requestMethod, $requestUri, $requestData = null, $withMiddlewar
 
     // Use the application settings
     $settings = require __DIR__ . '/../src/settings.php';
-
+    
     // Instantiate the application
     $app = new App($settings);
 
     // Set up dependencies
     require __DIR__ . '/../src/dependencies.php';
+
+    // Register additional dependencies
+    if (!empty($dependencies)) {
+        $container = $app->getContainer();
+        foreach($dependencies as $key => $value) {
+            if(is_callable($value)) {
+                $container[$key] = $value;
+            }
+        }
+    }
 
     // Register middleware
     if ($withMiddleware) {
@@ -53,6 +66,9 @@ function runApp($requestMethod, $requestUri, $requestData = null, $withMiddlewar
 
     // Register routes
     require __DIR__ . '/../src/routes.php';
+
+    // Propel configuration
+    require __DIR__ . '/../src/connection.php';
 
     // Process the application
     $response = $app->process($request, $response);

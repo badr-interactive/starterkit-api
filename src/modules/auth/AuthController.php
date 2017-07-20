@@ -2,6 +2,7 @@
 
 namespace App\Modules\Auth;
 
+use Slim\Container;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Modules\Auth\Model\User;
@@ -9,6 +10,13 @@ use Ramsey\Uuid\Uuid;
 
 class AuthController
 {
+    function __construct(Container $container)
+    {
+        if($container->has('User')) {
+            $this->user = $container->get('User');
+        }
+    }
+
     public function register(Request $request, Response $response)
     {
         $contentType = $request->getHeaderLine('Content-Type');
@@ -23,14 +31,13 @@ class AuthController
         }
 
         // TODO: Inject models using DI?
-        $user = new User;
         $uuid = Uuid::uuid4()->toString();
         $hashedPassword = password_hash($params['password'], PASSWORD_BCRYPT);
-        $user->setEmail($params['email']);
-        $user->setPassword($hashedPassword);
-        $user->setUuid($uuid);
-        $user->setCreatedAt(date('Y-m-d H:i:s'));
-        $user->save();
+        $this->user->setEmail($params['email']);
+        $this->user->setPassword($hashedPassword);
+        $this->user->setUuid($uuid);
+        $this->user->setCreatedAt(date('Y-m-d H:i:s'));
+        $this->user->save();
 
         $responseData = [
             'success' => true,
