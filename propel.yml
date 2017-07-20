@@ -4,7 +4,7 @@ propel:
             starterkit:
                 adapter: mysql
                 classname: Propel\Runtime\Connection\ConnectionWrapper
-                dsn: "mysql:host=localhost;port=6666;dbname=starterkit"
+                dsn: "mysql:host=localhost;port=6666;dbname=freedom"
                 user: root
                 password: s3cr3t
                 attributes:

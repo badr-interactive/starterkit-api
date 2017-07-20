@@ -4,9 +4,15 @@ namespace App\Modules\Auth;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use App\Modules\Auth\Model\User;
 
 class AuthController
 {
+    function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
     public function register(Request $request, Response $response)
     {
         $contentType = $request->getHeaderLine('Content-Type');
