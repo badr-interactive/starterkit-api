@@ -1,3 +1,8 @@
 /vendor/
+/generated-classes/*
+/generated-sql/*
+/generated-migrations/*
 /logs/*
 !/logs/README.md
+.vscode/
+.env

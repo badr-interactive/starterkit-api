@@ -1,10 +1,21 @@
 <?php
-// Routes
+$app = new \Slim\App();
+$dir = '/usr/share/nginx/src/modules';
+$files = scandir($dir);
+foreach($files as $key => $value) {
+    if($value == '.' || $value == '..') {
+        continue;
+    }
 
-$app->get('/[{name}]', function ($request, $response, $args) {
-    // Sample log message
-    $this->logger->info("Slim-Skeleton '/' route");
+    $fullpath = $dir . '/' . $value;
+    
+    if(!is_dir($fullpath)) {
+        continue;
+    }
 
-    // Render index view
-    return $this->renderer->render($response, 'index.phtml', $args);
-});
+    if(!is_file($fullpath . '/routes.php')) {
+        continue;
+    }
+
+    include_once $fullpath . '/routes.php';
+}
