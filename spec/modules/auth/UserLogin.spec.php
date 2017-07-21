@@ -1,5 +1,0 @@
-<?php
-
-describe('AuthController', function() {
-    
-});
