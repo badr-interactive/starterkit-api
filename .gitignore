@@ -5,4 +5,3 @@
 /logs/*
 !/logs/README.md
 .vscode/
-.env

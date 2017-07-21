@@ -1,6 +1,6 @@
 <?php
-$app = new \Slim\App();
-$dir = '/usr/share/nginx/src/modules';
+
+$dir = __DIR__ . '/modules';
 $files = scandir($dir);
 foreach($files as $key => $value) {
     if($value == '.' || $value == '..') {
@@ -17,5 +17,5 @@ foreach($files as $key => $value) {
         continue;
     }
 
-    include_once $fullpath . '/routes.php';
+    require $fullpath . '/routes.php';
 }

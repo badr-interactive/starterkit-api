@@ -1,13 +1,13 @@
 <?php
 $serviceContainer = \Propel\Runtime\Propel::getServiceContainer();
 $serviceContainer->checkVersion('2.0.0-dev');
-$serviceContainer->setAdapterClass('bookstore', 'mysql');
+$serviceContainer->setAdapterClass('starterkit', 'mysql');
 $manager = new \Propel\Runtime\Connection\ConnectionManagerSingle();
 $manager->setConfiguration(array (
   'classname' => 'Propel\\Runtime\\Connection\\ConnectionWrapper',
-  'dsn' => 'mysql:host=192.168.99.100;port=6666;dbname=dev_bookstore',
-  'user' => 'devel',
-  'password' => 'password123',
+  'dsn' => 'mysql:host=localhost;port=6666;dbname=freedom',
+  'user' => 'root',
+  'password' => 's3cr3t',
   'attributes' =>
   array (
     'ATTR_EMULATE_PREPARES' => false,
@@ -19,6 +19,6 @@ $manager->setConfiguration(array (
     1 => 'vendor',
   ),
 ));
-$manager->setName('bookstore');
-$serviceContainer->setConnectionManager('bookstore', $manager);
-$serviceContainer->setDefaultDatasource('bookstore');
+$manager->setName('starterkit');
+$serviceContainer->setConnectionManager('starterkit', $manager);
+$serviceContainer->setDefaultDatasource('starterkit');
