@@ -32,7 +32,12 @@ class LoginController
         if (!$user = $this->validateUser($params)) {
             return $response->withJson(['success' => false], 400);            
         }
-        $token = $this->getToken($request, $random);
+        
+        $salt = $this->random();
+        $token = $this->getToken($request, $salt);
+        if (!$this->saveSalt($user, $salt)) {
+            return $response->withJson(['success' => false], 400);            
+        }
 
         $responseData = [
             "success" => true,
@@ -86,20 +91,6 @@ class LoginController
         return $user;
     }
 
-    private function getToken($request)
-    {
-        $token = (new Builder())->setIssuer($request->getUri()) // Configures the issuer (iss claim)
-                        ->setAudience($request->getUri()) // Configures the audience (aud claim)
-                        ->setId($this->random, true) // Configures the id (jti claim), replicating as a header item
-                        ->setIssuedAt(time()) // Configures the time that the token was issue (iat claim)
-                        ->setNotBefore(time() + 60) // Configures the time that the token can be used (nbf claim)
-                        ->setExpiration(time() + 3600) // Configures the expiration time of the token (nbf claim)
-                        ->set('uid', 1) // Configures a new claim, called "uid"
-                        ->getToken(); // Retrieves the generated token
-
-        return $token;
-    }
-
     private function random($length = 16)
     {
         $string = '';
@@ -114,4 +105,29 @@ class LoginController
 
         return $string;
     }
+
+    private function getToken($request, $salt)
+    {
+        $token = (new Builder())->setIssuer($request->getUri()) // Configures the issuer (iss claim)
+                        ->setAudience($request->getUri()) // Configures the audience (aud claim)
+                        ->setId($salt, true) // Configures the id (jti claim), replicating as a header item
+                        ->setIssuedAt(time()) // Configures the time that the token was issue (iat claim)
+                        ->setNotBefore(time() + 60) // Configures the time that the token can be used (nbf claim)
+                        ->setExpiration(time() + 3600) // Configures the expiration time of the token (nbf claim)
+                        ->set('uid', $this->random()) // Configures a new claim, called "uid"
+                        ->getToken(); // Retrieves the generated token
+
+        return $token;
+    }
+
+    private function saveSalt($user, $salt)
+    {
+        $user->setApiToken($salt);
+        if (!$user->save()) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
