@@ -23,8 +23,10 @@ services:
         networks:
             - database
             - server
+            - smtp
         links:
             - mysql
+            - mailhog
     
     mysql:
         container_name: mysql
@@ -40,9 +42,18 @@ services:
             MYSQL_DATABASE: ${DB_NAME}
             MYSQL_USER: ${DB_USERNAME}
             MYSQL_PASSWORD: ${DB_PASSWORD}
-
+    
+    mailhog:
+        container_name: mailhog
+        image: mailhog/mailhog:latest
+        networks:
+            - smtp
+        ports:
+            - "8025:8025"
+            - "1025:1025"
 volumes:
     db_data:
 networks:
     server:
     database:
+    smtp:
