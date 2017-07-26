@@ -34,7 +34,7 @@ class LoginController
         }
         
         $salt = $this->random();
-        $token = $this->getToken($request, $salt);
+        $token = $this->getToken($request, $user, $salt);
         if (!$this->saveSalt($user, $salt)) {
             return $response->withJson(['success' => false], 400);            
         }
@@ -106,7 +106,7 @@ class LoginController
         return $string;
     }
 
-    private function getToken($request, $salt)
+    private function getToken($request, $user, $salt)
     {
         $token = (new Builder())->setIssuer($request->getUri()) // Configures the issuer (iss claim)
                         ->setAudience($request->getUri()) // Configures the audience (aud claim)
@@ -114,7 +114,7 @@ class LoginController
                         ->setIssuedAt(time()) // Configures the time that the token was issue (iat claim)
                         ->setNotBefore(time() + 60) // Configures the time that the token can be used (nbf claim)
                         ->setExpiration(time() + 3600) // Configures the expiration time of the token (nbf claim)
-                        ->set('uid', $this->random()) // Configures a new claim, called "uid"
+                        ->set('uuid', $user->getUuid()) // Configures a new claim, called "uid"
                         ->getToken(); // Retrieves the generated token
 
         return $token;
