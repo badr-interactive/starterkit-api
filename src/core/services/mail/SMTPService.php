@@ -4,22 +4,23 @@ namespace App\Core\Services\Mail;
 
 use Slim\Container;
 
-class SMTPService
+class SMTPService extends \PHPMailer
 {
-    protected $settings = [];
+    protected $recipients = [];
+    protected $subject = "";
+    protected $body = "";
 
     function __construct(Container $container)
     {
-        $this->settings = $container->get('settings')['mail'];
-    }
+        parent::__construct();
+        $settings = $container->get('settings')['mail'];
 
-    public function set($key, $value)
-    {
-        $this->settings[$key] = $value;
-    }
-
-    public function getSettings()
-    {
-        return $this->settings;
+        $this->isSMTP();
+        $this->Host = $settings['host'];
+        $this->Port = $settings['port'];
+        $this->SMTPAuth = true;
+        $this->Username = $settings['username'];
+        $this->Password = $settings['password'];
+        $this->From = $settings['from'];
     }
 }

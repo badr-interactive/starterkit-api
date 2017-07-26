@@ -6,7 +6,8 @@ describe('SMTP Mail Service', function() {
             'host' => 'localhost',
             'port' => 25,
             'username' => '',
-            'password' => ''
+            'password' => '',
+            'from' => 'no-reply@example.com'
         ];
         
         $container = Phake::mock(Slim\Container::class);
@@ -17,31 +18,43 @@ describe('SMTP Mail Service', function() {
         return $container;
     });
 
-    it('should load settings from slim settings.php', function() {
+    it('should load default settings',function() {
+        $settings = $this->container->get('settings')['mail'];
         $service = new App\Core\Services\Mail\SMTPService($this->container);
-        $serviceSettings = $service->getSettings();
-        expect($serviceSettings['host'])->toBe('localhost');
-        expect($serviceSettings['port'])->toBe(25);
-        expect($serviceSettings['username'])->toBe('');
-        expect($serviceSettings['password'])->toBe('');
+        expect($service->Host)->toBe($settings['host']);
+        expect($service->Port)->toBe($settings['port']);
+        expect($service->Username)->toBe($settings['username']);
+        expect($service->Password)->toBe($settings['password']);
+        expect($service->From)->toBe($settings['from']);
     });
 
-    it('should be able to override default settings', function() {
+    it('should able to alter config', function() {
         $service = new App\Core\Services\Mail\SMTPService($this->container);
-        $service->set('host', 'example.com');
-        expect($service->getSettings()['host'])->toBe('example.com');
-        expect($service->getSettings()['port'])->toBe(25);
+        expect($service->Host)->toBe('localhost');
+        $service->Host = 'example.com';
+        expect($service->Host)->toBe('example.com');
 
-        $service->set('port', 1025);
-        expect($service->getSettings()['port'])->toBe(1025);
-        expect($service->getSettings()['username'])->toBe('');
+        expect($service->Port)->toBe(25);
+        $service->Port = 1225;
+        expect($service->Port)->toBe(1225);
     });
 
-    it('should be able to send message', function() {
+    it('should able to send message to server', function() {
         $service = new App\Core\Services\Mail\SMTPService($this->container);
-        $from = "me@example.com";
-        $to = "you@example.com";
-        $subject = "Let's meet at Office!";
-        $result = $service->send($from, $to, $subject);
+        $service->Port = 1025;
+        $service->Subject = 'Mail from Heaven';
+        $service->Body = 'Hello Dude!';
+
+        $to = uniqid("me_") . '@example.com';
+        $service->addAddress($to, 'Me Boo');
+        $result = $service->send();
+        expect($result)->toBe(true);
+
+        $url = "http://localhost:8025/api/v2/search?kind=to&query=" . $to;
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = json_decode(curl_exec($ch));
+        curl_close($ch);
+        expect($response->total)->toBe(1);
     });
 });
