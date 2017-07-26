@@ -14,6 +14,10 @@ class LogoutController
         if ($container->has('UserQuery')) {
             $this->userModel = $container->get('UserQuery');
         }
+
+        if ($container->has('auth')) {
+            $this->auth = $container->get('auth');
+        }
     }
 
     public function logout(Request $request, Response $response)
@@ -23,9 +27,8 @@ class LogoutController
             return $response->withJson(['success' => false], 400);
         }
 
-        // TODO : get user from authorization header
         try {
-            $user = $this->userModel->findOne();
+            $user = $this->auth;
             $user->setApiToken(null);
             $user->save();
 

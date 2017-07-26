@@ -18,6 +18,14 @@ $container['logger'] = function ($c) {
     return $logger;
 };
 
+$container['auth'] = function ($c) {
+    $authorization = str_replace('Bearer ', '', $c->request->getHeaderLine('Authorization'));
+    $token = (new \Lcobucci\JWT\Parser())->parse((string) $authorization); // Parses from a string
+
+    $user = \App\Modules\Auth\Model\UserQuery::create()->findOneByUuid($token->getClaim('uuid'));
+
+    return $user;
+};
 
 // module specific deppendencies
 $dir = __DIR__ . '/modules';
