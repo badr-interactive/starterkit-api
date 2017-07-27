@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="starterkit" defaultIdMethod="native" identifierQuoting="true">
+    <table name="users" phpName="User" namespace="App\Modules\Auth\Model">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+        <column name="uuid" type="varchar" size="36" required="true" />
+        <column name="email" type="varchar" size="50" required="true" />
+        <column name="password" type="char" size="60" required="true" />
+        <column name="api_token" type="longvarchar" />
+        <column name="created_at" type="timestamp" />
+        <column name="updated_at" type="timestamp" />
+    </table>
+</database>
