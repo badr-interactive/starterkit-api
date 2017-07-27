@@ -3,5 +3,7 @@ php:
     - 5.6
     - 7.0
     - 7.1
-before_script: composer update
+before_script:
+    - composer install
+    - composer dump-autoload
 script: vendor/bin/kahlan
