@@ -1,6 +1,6 @@
 <?php
 
-$dir = __DIR__ . '/modules';
+$dir = __DIR__ . '/Modules';
 $files = scandir($dir);
 foreach($files as $key => $value) {
     if($value == '.' || $value == '..') {
