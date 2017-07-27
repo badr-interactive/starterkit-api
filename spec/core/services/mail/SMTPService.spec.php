@@ -40,23 +40,4 @@ describe('SMTP Mail Service', function() {
         $service->Port = 1225;
         expect($service->Port)->toBe(1225);
     });
-
-    it('should able to send message to server', function() {
-        $service = new SMTPService($this->container);
-        $service->Port = 1025;
-        $service->Subject = 'Mail from Heaven';
-        $service->Body = 'Hello Dude!';
-
-        $to = uniqid("me_") . '@example.com';
-        $service->addAddress($to, 'Me Boo');
-        $result = $service->send();
-        expect($result)->toBe(true);
-
-        $url = "http://localhost:8025/api/v2/search?kind=to&query=" . $to;
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = json_decode(curl_exec($ch));
-        curl_close($ch);
-        expect($response->total)->toBe(1);
-    });
 });
