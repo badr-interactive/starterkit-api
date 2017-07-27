@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\Services\Mail\SMTPService;
+
 describe('SMTP Mail Service', function() {
     given('container', function() {
         $settings = [
@@ -20,7 +22,7 @@ describe('SMTP Mail Service', function() {
 
     it('should load default settings',function() {
         $settings = $this->container->get('settings')['mail'];
-        $service = new App\Core\Services\Mail\SMTPService($this->container);
+        $service = new SMTPService($this->container);
         expect($service->Host)->toBe($settings['host']);
         expect($service->Port)->toBe($settings['port']);
         expect($service->Username)->toBe($settings['username']);
@@ -29,7 +31,7 @@ describe('SMTP Mail Service', function() {
     });
 
     it('should able to alter config', function() {
-        $service = new App\Core\Services\Mail\SMTPService($this->container);
+        $service = new SMTPService($this->container);
         expect($service->Host)->toBe('localhost');
         $service->Host = 'example.com';
         expect($service->Host)->toBe('example.com');
@@ -40,7 +42,7 @@ describe('SMTP Mail Service', function() {
     });
 
     it('should able to send message to server', function() {
-        $service = new App\Core\Services\Mail\SMTPService($this->container);
+        $service = new SMTPService($this->container);
         $service->Port = 1025;
         $service->Subject = 'Mail from Heaven';
         $service->Body = 'Hello Dude!';
