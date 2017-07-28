@@ -48,6 +48,22 @@ class AuthController
         return $response->withJson($responseData, 200);
     }
 
+    public function forgotPassword(Request $request, Response $response)
+    {
+        $params = $request->getParsedBody();
+        $checklist = ['email'];
+        if(!$this->validateRequiredParam($checklist, $request)) {
+            return $response->withJson(['success' => false], 400);
+        }
+
+        $resetToken = substr(uniqid(), 0, 6);
+        $user = UserQuery::create()->findOneByEmail($params['email']);
+        $user->setResetToken($resetToken);
+        $user->save();
+        
+        return $response->withJson(['success' => true], 200);
+    }
+
     private function validateRequiredParam($checklist = [], $request)
     {
         $params = $request->getParsedBody();
