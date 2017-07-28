@@ -27,6 +27,10 @@ $container['auth'] = function ($c) {
     return $user;
 };
 
+$container['SMTPService'] = function ($c) {
+    return new App\Core\Services\Mail\SMTPService($c);
+};
+
 // module specific deppendencies
 $dir = __DIR__ . '/Modules';
 $files = scandir($dir);

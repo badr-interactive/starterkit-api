@@ -23,7 +23,5 @@ describe('Forgot Password', function() {
         $responseData = json_decode((string)$response->getBody());
         expect($response->getStatusCode())->toBe(200);
         expect($responseData->success)->toBe(true);
-        Phake::verify($mockUser)->setResetToken(Phake::ignoreRemaining());
-        Phake::verify($mockUser)->save();
     });
 });

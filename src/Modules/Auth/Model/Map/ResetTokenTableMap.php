@@ -2,8 +2,8 @@
 
 namespace App\Modules\Auth\Model\Map;
 
-use App\Modules\Auth\Model\User;
-use App\Modules\Auth\Model\UserQuery;
+use App\Modules\Auth\Model\ResetToken;
+use App\Modules\Auth\Model\ResetTokenQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'users' table.
+ * This class defines the structure of the 'reset_tokens' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class UserTableMap extends TableMap
+class ResetTokenTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class UserTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'App.Modules.Auth.Model.Map.UserTableMap';
+    const CLASS_NAME = 'App.Modules.Auth.Model.Map.ResetTokenTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class UserTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'users';
+    const TABLE_NAME = 'reset_tokens';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\App\\Modules\\Auth\\Model\\User';
+    const OM_CLASS = '\\App\\Modules\\Auth\\Model\\ResetToken';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'App.Modules.Auth.Model.User';
+    const CLASS_DEFAULT = 'App.Modules.Auth.Model.ResetToken';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 3;
 
     /**
      * The number of lazy-loaded columns
@@ -69,42 +69,22 @@ class UserTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
-
-    /**
-     * the column name for the id field
-     */
-    const COL_ID = 'users.id';
-
-    /**
-     * the column name for the uuid field
-     */
-    const COL_UUID = 'users.uuid';
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /**
      * the column name for the email field
      */
-    const COL_EMAIL = 'users.email';
+    const COL_EMAIL = 'reset_tokens.email';
 
     /**
-     * the column name for the password field
+     * the column name for the token field
      */
-    const COL_PASSWORD = 'users.password';
+    const COL_TOKEN = 'reset_tokens.token';
 
     /**
-     * the column name for the api_token field
+     * the column name for the expired_at field
      */
-    const COL_API_TOKEN = 'users.api_token';
-
-    /**
-     * the column name for the created_at field
-     */
-    const COL_CREATED_AT = 'users.created_at';
-
-    /**
-     * the column name for the updated_at field
-     */
-    const COL_UPDATED_AT = 'users.updated_at';
+    const COL_EXPIRED_AT = 'reset_tokens.expired_at';
 
     /**
      * The default string format for model objects of the related table
@@ -118,11 +98,11 @@ class UserTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Uuid', 'Email', 'Password', 'ApiToken', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'uuid', 'email', 'password', 'apiToken', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(UserTableMap::COL_ID, UserTableMap::COL_UUID, UserTableMap::COL_EMAIL, UserTableMap::COL_PASSWORD, UserTableMap::COL_API_TOKEN, UserTableMap::COL_CREATED_AT, UserTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'uuid', 'email', 'password', 'api_token', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Email', 'Token', 'ExpiredAt', ),
+        self::TYPE_CAMELNAME     => array('email', 'token', 'expiredAt', ),
+        self::TYPE_COLNAME       => array(ResetTokenTableMap::COL_EMAIL, ResetTokenTableMap::COL_TOKEN, ResetTokenTableMap::COL_EXPIRED_AT, ),
+        self::TYPE_FIELDNAME     => array('email', 'token', 'expired_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -132,11 +112,11 @@ class UserTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Uuid' => 1, 'Email' => 2, 'Password' => 3, 'ApiToken' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'uuid' => 1, 'email' => 2, 'password' => 3, 'apiToken' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(UserTableMap::COL_ID => 0, UserTableMap::COL_UUID => 1, UserTableMap::COL_EMAIL => 2, UserTableMap::COL_PASSWORD => 3, UserTableMap::COL_API_TOKEN => 4, UserTableMap::COL_CREATED_AT => 5, UserTableMap::COL_UPDATED_AT => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'uuid' => 1, 'email' => 2, 'password' => 3, 'api_token' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Email' => 0, 'Token' => 1, 'ExpiredAt' => 2, ),
+        self::TYPE_CAMELNAME     => array('email' => 0, 'token' => 1, 'expiredAt' => 2, ),
+        self::TYPE_COLNAME       => array(ResetTokenTableMap::COL_EMAIL => 0, ResetTokenTableMap::COL_TOKEN => 1, ResetTokenTableMap::COL_EXPIRED_AT => 2, ),
+        self::TYPE_FIELDNAME     => array('email' => 0, 'token' => 1, 'expired_at' => 2, ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -149,20 +129,16 @@ class UserTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('users');
-        $this->setPhpName('User');
+        $this->setName('reset_tokens');
+        $this->setPhpName('ResetToken');
         $this->setIdentifierQuoting(true);
-        $this->setClassName('\\App\\Modules\\Auth\\Model\\User');
+        $this->setClassName('\\App\\Modules\\Auth\\Model\\ResetToken');
         $this->setPackage('App.Modules.Auth.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('uuid', 'Uuid', 'VARCHAR', true, 36, null);
-        $this->addColumn('email', 'Email', 'VARCHAR', true, 50, null);
-        $this->addColumn('password', 'Password', 'CHAR', true, 60, null);
-        $this->addColumn('api_token', 'ApiToken', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('email', 'Email', 'VARCHAR', true, 50, null);
+        $this->addPrimaryKey('token', 'Token', 'CHAR', true, 6, null);
+        $this->addColumn('expired_at', 'ExpiredAt', 'TIMESTAMP', true, null, null);
     } // initialize()
 
     /**
@@ -171,6 +147,59 @@ class UserTableMap extends TableMap
     public function buildRelations()
     {
     } // buildRelations()
+
+    /**
+     * Adds an object to the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
+     *
+     * @param \App\Modules\Auth\Model\ResetToken $obj A \App\Modules\Auth\Model\ResetToken object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
+     */
+    public static function addInstanceToPool($obj, $key = null)
+    {
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize([(null === $obj->getEmail() || is_scalar($obj->getEmail()) || is_callable([$obj->getEmail(), '__toString']) ? (string) $obj->getEmail() : $obj->getEmail()), (null === $obj->getToken() || is_scalar($obj->getToken()) || is_callable([$obj->getToken(), '__toString']) ? (string) $obj->getToken() : $obj->getToken())]);
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \App\Modules\Auth\Model\ResetToken object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \App\Modules\Auth\Model\ResetToken) {
+                $key = serialize([(null === $value->getEmail() || is_scalar($value->getEmail()) || is_callable([$value->getEmail(), '__toString']) ? (string) $value->getEmail() : $value->getEmail()), (null === $value->getToken() || is_scalar($value->getToken()) || is_callable([$value->getToken(), '__toString']) ? (string) $value->getToken() : $value->getToken())]);
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize([(null === $value[0] || is_scalar($value[0]) || is_callable([$value[0], '__toString']) ? (string) $value[0] : $value[0]), (null === $value[1] || is_scalar($value[1]) || is_callable([$value[1], '__toString']) ? (string) $value[1] : $value[1])]);
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \App\Modules\Auth\Model\ResetToken object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -188,11 +217,11 @@ class UserTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Token', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize([(null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)]), (null === $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Token', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Token', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Token', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Token', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Token', TableMap::TYPE_PHPNAME, $indexType)])]);
     }
 
     /**
@@ -209,11 +238,20 @@ class UserTableMap extends TableMap
      */
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        return (int) $row[
+            $pks = [];
+
+        $pks[] = (string) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 0 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                : self::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)
         ];
+        $pks[] = (string) $row[
+            $indexType == TableMap::TYPE_NUM
+                ? 1 + $offset
+                : self::translateFieldName('Token', TableMap::TYPE_PHPNAME, $indexType)
+        ];
+
+        return $pks;
     }
 
     /**
@@ -229,7 +267,7 @@ class UserTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? UserTableMap::CLASS_DEFAULT : UserTableMap::OM_CLASS;
+        return $withPrefix ? ResetTokenTableMap::CLASS_DEFAULT : ResetTokenTableMap::OM_CLASS;
     }
 
     /**
@@ -243,22 +281,22 @@ class UserTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (User object, last column rank)
+     * @return array           (ResetToken object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = UserTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = UserTableMap::getInstanceFromPool($key))) {
+        $key = ResetTokenTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ResetTokenTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + UserTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ResetTokenTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = UserTableMap::OM_CLASS;
-            /** @var User $obj */
+            $cls = ResetTokenTableMap::OM_CLASS;
+            /** @var ResetToken $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            UserTableMap::addInstanceToPool($obj, $key);
+            ResetTokenTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -281,18 +319,18 @@ class UserTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = UserTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = UserTableMap::getInstanceFromPool($key))) {
+            $key = ResetTokenTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ResetTokenTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var User $obj */
+                /** @var ResetToken $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                UserTableMap::addInstanceToPool($obj, $key);
+                ResetTokenTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -313,21 +351,13 @@ class UserTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(UserTableMap::COL_ID);
-            $criteria->addSelectColumn(UserTableMap::COL_UUID);
-            $criteria->addSelectColumn(UserTableMap::COL_EMAIL);
-            $criteria->addSelectColumn(UserTableMap::COL_PASSWORD);
-            $criteria->addSelectColumn(UserTableMap::COL_API_TOKEN);
-            $criteria->addSelectColumn(UserTableMap::COL_CREATED_AT);
-            $criteria->addSelectColumn(UserTableMap::COL_UPDATED_AT);
+            $criteria->addSelectColumn(ResetTokenTableMap::COL_EMAIL);
+            $criteria->addSelectColumn(ResetTokenTableMap::COL_TOKEN);
+            $criteria->addSelectColumn(ResetTokenTableMap::COL_EXPIRED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.uuid');
             $criteria->addSelectColumn($alias . '.email');
-            $criteria->addSelectColumn($alias . '.password');
-            $criteria->addSelectColumn($alias . '.api_token');
-            $criteria->addSelectColumn($alias . '.created_at');
-            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.token');
+            $criteria->addSelectColumn($alias . '.expired_at');
         }
     }
 
@@ -340,7 +370,7 @@ class UserTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(UserTableMap::DATABASE_NAME)->getTable(UserTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ResetTokenTableMap::DATABASE_NAME)->getTable(ResetTokenTableMap::TABLE_NAME);
     }
 
     /**
@@ -348,16 +378,16 @@ class UserTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(UserTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(UserTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new UserTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(ResetTokenTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(ResetTokenTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new ResetTokenTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a User or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ResetToken or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or User object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ResetToken object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -368,27 +398,37 @@ class UserTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(UserTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ResetTokenTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \App\Modules\Auth\Model\User) { // it's a model object
+        } elseif ($values instanceof \App\Modules\Auth\Model\ResetToken) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(UserTableMap::DATABASE_NAME);
-            $criteria->add(UserTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ResetTokenTableMap::DATABASE_NAME);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(ResetTokenTableMap::COL_EMAIL, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(ResetTokenTableMap::COL_TOKEN, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
-        $query = UserQuery::create()->mergeWith($criteria);
+        $query = ResetTokenQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            UserTableMap::clearInstancePool();
+            ResetTokenTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                UserTableMap::removeInstanceFromPool($singleval);
+                ResetTokenTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -396,20 +436,20 @@ class UserTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the users table.
+     * Deletes all rows from the reset_tokens table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return UserQuery::create()->doDeleteAll($con);
+        return ResetTokenQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a User or Criteria object.
+     * Performs an INSERT on the database, given a ResetToken or Criteria object.
      *
-     * @param mixed               $criteria Criteria or User object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ResetToken object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -418,22 +458,18 @@ class UserTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(UserTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ResetTokenTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from User object
-        }
-
-        if ($criteria->containsKey(UserTableMap::COL_ID) && $criteria->keyContainsValue(UserTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.UserTableMap::COL_ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from ResetToken object
         }
 
 
         // Set the correct dbName
-        $query = UserQuery::create()->mergeWith($criteria);
+        $query = ResetTokenQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -442,7 +478,7 @@ class UserTableMap extends TableMap
         });
     }
 
-} // UserTableMap
+} // ResetTokenTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-UserTableMap::buildTableMap();
+ResetTokenTableMap::buildTableMap();

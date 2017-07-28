@@ -6,6 +6,9 @@ use Slim\Container;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Modules\Auth\Model\User;
+use App\Modules\Auth\Model\UserQuery;
+use App\Modules\Auth\Model\ResetToken;
+use App\Modules\Auth\Model\ResetTokenQuery;
 use Ramsey\Uuid\Uuid;
 
 class AuthController
@@ -14,6 +17,10 @@ class AuthController
     {
         if($container->has('User')) {
             $this->user = $container->get('User');
+        }
+
+        if($container->has('SMTPService')) {
+            $this->smtp = $container->get('SMTPService');
         }
     }
 
@@ -56,11 +63,26 @@ class AuthController
             return $response->withJson(['success' => false], 400);
         }
 
-        $resetToken = substr(uniqid(), 0, 6);
+        $token = strtoupper(substr(uniqid(), -6));
         $user = UserQuery::create()->findOneByEmail($params['email']);
-        $user->setResetToken($resetToken);
-        $user->save();
         
+        $resetToken = ResetTokenQuery::create()->findOneByEmail($params['email']);
+        if($resetToken) {
+            $resetToken->delete();
+        }
+
+        $resetToken = new ResetToken();
+        $resetToken->setEmail($params['email']);
+        $resetToken->setToken($token);
+        $resetToken->setExpiredAt(date('Y-m-d H:i:s'));
+        $resetToken->save();
+        
+        $this->smtp->addAddress($params['email']);
+        $this->smtp->Body = 'your reset token is <b>' . $token . '</b>';
+        if(!$this->smtp->send()) {
+            return $response->withJson(['success' => false], 500);
+        }
+
         return $response->withJson(['success' => true], 200);
     }
 

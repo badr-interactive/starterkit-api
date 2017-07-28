@@ -5,8 +5,8 @@ namespace App\Modules\Auth\Model\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
-use App\Modules\Auth\Model\UserQuery as ChildUserQuery;
-use App\Modules\Auth\Model\Map\UserTableMap;
+use App\Modules\Auth\Model\ResetTokenQuery as ChildResetTokenQuery;
+use App\Modules\Auth\Model\Map\ResetTokenTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -21,18 +21,18 @@ use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 
 /**
- * Base class that represents a row from the 'users' table.
+ * Base class that represents a row from the 'reset_tokens' table.
  *
  *
  *
  * @package    propel.generator.App.Modules.Auth.Model.Base
  */
-abstract class User implements ActiveRecordInterface
+abstract class ResetToken implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\App\\Modules\\Auth\\Model\\Map\\UserTableMap';
+    const TABLE_MAP = '\\App\\Modules\\Auth\\Model\\Map\\ResetTokenTableMap';
 
 
     /**
@@ -62,20 +62,6 @@ abstract class User implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the id field.
-     *
-     * @var        int
-     */
-    protected $id;
-
-    /**
-     * The value for the uuid field.
-     *
-     * @var        string
-     */
-    protected $uuid;
-
-    /**
      * The value for the email field.
      *
      * @var        string
@@ -83,32 +69,18 @@ abstract class User implements ActiveRecordInterface
     protected $email;
 
     /**
-     * The value for the password field.
+     * The value for the token field.
      *
      * @var        string
      */
-    protected $password;
+    protected $token;
 
     /**
-     * The value for the api_token field.
-     *
-     * @var        string
-     */
-    protected $api_token;
-
-    /**
-     * The value for the created_at field.
+     * The value for the expired_at field.
      *
      * @var        DateTime
      */
-    protected $created_at;
-
-    /**
-     * The value for the updated_at field.
-     *
-     * @var        DateTime
-     */
-    protected $updated_at;
+    protected $expired_at;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -119,7 +91,7 @@ abstract class User implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of App\Modules\Auth\Model\Base\User object.
+     * Initializes internal state of App\Modules\Auth\Model\Base\ResetToken object.
      */
     public function __construct()
     {
@@ -214,9 +186,9 @@ abstract class User implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>User</code> instance.  If
-     * <code>obj</code> is an instance of <code>User</code>, delegates to
-     * <code>equals(User)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ResetToken</code> instance.  If
+     * <code>obj</code> is an instance of <code>ResetToken</code>, delegates to
+     * <code>equals(ResetToken)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -282,7 +254,7 @@ abstract class User implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|User The current object, for fluid interface
+     * @return $this|ResetToken The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -344,26 +316,6 @@ abstract class User implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Get the [uuid] column value.
-     *
-     * @return string
-     */
-    public function getUuid()
-    {
-        return $this->uuid;
-    }
-
-    /**
      * Get the [email] column value.
      *
      * @return string
@@ -374,27 +326,17 @@ abstract class User implements ActiveRecordInterface
     }
 
     /**
-     * Get the [password] column value.
+     * Get the [token] column value.
      *
      * @return string
      */
-    public function getPassword()
+    public function getToken()
     {
-        return $this->password;
+        return $this->token;
     }
 
     /**
-     * Get the [api_token] column value.
-     *
-     * @return string
-     */
-    public function getApiToken()
-    {
-        return $this->api_token;
-    }
-
-    /**
-     * Get the [optionally formatted] temporal [created_at] column value.
+     * Get the [optionally formatted] temporal [expired_at] column value.
      *
      *
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
@@ -404,80 +346,20 @@ abstract class User implements ActiveRecordInterface
      *
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getCreatedAt($format = NULL)
+    public function getExpiredAt($format = NULL)
     {
         if ($format === null) {
-            return $this->created_at;
+            return $this->expired_at;
         } else {
-            return $this->created_at instanceof \DateTimeInterface ? $this->created_at->format($format) : null;
+            return $this->expired_at instanceof \DateTimeInterface ? $this->expired_at->format($format) : null;
         }
     }
-
-    /**
-     * Get the [optionally formatted] temporal [updated_at] column value.
-     *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw DateTime object will be returned.
-     *
-     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
-     */
-    public function getUpdatedAt($format = NULL)
-    {
-        if ($format === null) {
-            return $this->updated_at;
-        } else {
-            return $this->updated_at instanceof \DateTimeInterface ? $this->updated_at->format($format) : null;
-        }
-    }
-
-    /**
-     * Set the value of [id] column.
-     *
-     * @param int $v new value
-     * @return $this|\App\Modules\Auth\Model\User The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[UserTableMap::COL_ID] = true;
-        }
-
-        return $this;
-    } // setId()
-
-    /**
-     * Set the value of [uuid] column.
-     *
-     * @param string $v new value
-     * @return $this|\App\Modules\Auth\Model\User The current object (for fluent API support)
-     */
-    public function setUuid($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->uuid !== $v) {
-            $this->uuid = $v;
-            $this->modifiedColumns[UserTableMap::COL_UUID] = true;
-        }
-
-        return $this;
-    } // setUuid()
 
     /**
      * Set the value of [email] column.
      *
      * @param string $v new value
-     * @return $this|\App\Modules\Auth\Model\User The current object (for fluent API support)
+     * @return $this|\App\Modules\Auth\Model\ResetToken The current object (for fluent API support)
      */
     public function setEmail($v)
     {
@@ -487,91 +369,51 @@ abstract class User implements ActiveRecordInterface
 
         if ($this->email !== $v) {
             $this->email = $v;
-            $this->modifiedColumns[UserTableMap::COL_EMAIL] = true;
+            $this->modifiedColumns[ResetTokenTableMap::COL_EMAIL] = true;
         }
 
         return $this;
     } // setEmail()
 
     /**
-     * Set the value of [password] column.
+     * Set the value of [token] column.
      *
      * @param string $v new value
-     * @return $this|\App\Modules\Auth\Model\User The current object (for fluent API support)
+     * @return $this|\App\Modules\Auth\Model\ResetToken The current object (for fluent API support)
      */
-    public function setPassword($v)
+    public function setToken($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->password !== $v) {
-            $this->password = $v;
-            $this->modifiedColumns[UserTableMap::COL_PASSWORD] = true;
+        if ($this->token !== $v) {
+            $this->token = $v;
+            $this->modifiedColumns[ResetTokenTableMap::COL_TOKEN] = true;
         }
 
         return $this;
-    } // setPassword()
+    } // setToken()
 
     /**
-     * Set the value of [api_token] column.
-     *
-     * @param string $v new value
-     * @return $this|\App\Modules\Auth\Model\User The current object (for fluent API support)
-     */
-    public function setApiToken($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->api_token !== $v) {
-            $this->api_token = $v;
-            $this->modifiedColumns[UserTableMap::COL_API_TOKEN] = true;
-        }
-
-        return $this;
-    } // setApiToken()
-
-    /**
-     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     * Sets the value of [expired_at] column to a normalized version of the date/time value specified.
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
-     * @return $this|\App\Modules\Auth\Model\User The current object (for fluent API support)
+     * @return $this|\App\Modules\Auth\Model\ResetToken The current object (for fluent API support)
      */
-    public function setCreatedAt($v)
+    public function setExpiredAt($v)
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
-        if ($this->created_at !== null || $dt !== null) {
-            if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
-                $this->created_at = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[UserTableMap::COL_CREATED_AT] = true;
+        if ($this->expired_at !== null || $dt !== null) {
+            if ($this->expired_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->expired_at->format("Y-m-d H:i:s.u")) {
+                $this->expired_at = $dt === null ? null : clone $dt;
+                $this->modifiedColumns[ResetTokenTableMap::COL_EXPIRED_AT] = true;
             }
         } // if either are not null
 
         return $this;
-    } // setCreatedAt()
-
-    /**
-     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
-     *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
-     *               Empty strings are treated as NULL.
-     * @return $this|\App\Modules\Auth\Model\User The current object (for fluent API support)
-     */
-    public function setUpdatedAt($v)
-    {
-        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
-        if ($this->updated_at !== null || $dt !== null) {
-            if ($this->updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated_at->format("Y-m-d H:i:s.u")) {
-                $this->updated_at = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[UserTableMap::COL_UPDATED_AT] = true;
-            }
-        } // if either are not null
-
-        return $this;
-    } // setUpdatedAt()
+    } // setExpiredAt()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -609,32 +451,17 @@ abstract class User implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : UserTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : UserTableMap::translateFieldName('Uuid', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->uuid = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : UserTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ResetTokenTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
             $this->email = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : UserTableMap::translateFieldName('Password', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->password = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ResetTokenTableMap::translateFieldName('Token', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->token = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : UserTableMap::translateFieldName('ApiToken', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->api_token = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : UserTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ResetTokenTableMap::translateFieldName('ExpiredAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
-            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : UserTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00 00:00:00') {
-                $col = null;
-            }
-            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+            $this->expired_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -643,10 +470,10 @@ abstract class User implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = UserTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = ResetTokenTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\App\\Modules\\Auth\\Model\\User'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\App\\Modules\\Auth\\Model\\ResetToken'), 0, $e);
         }
     }
 
@@ -688,13 +515,13 @@ abstract class User implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(UserTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ResetTokenTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildUserQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildResetTokenQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -713,8 +540,8 @@ abstract class User implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see User::setDeleted()
-     * @see User::isDeleted()
+     * @see ResetToken::setDeleted()
+     * @see ResetToken::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -723,11 +550,11 @@ abstract class User implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(UserTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ResetTokenTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildUserQuery::create()
+            $deleteQuery = ChildResetTokenQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -762,7 +589,7 @@ abstract class User implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(UserTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ResetTokenTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -781,7 +608,7 @@ abstract class User implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                UserTableMap::addInstanceToPool($this);
+                ResetTokenTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -838,36 +665,20 @@ abstract class User implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[UserTableMap::COL_ID] = true;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . UserTableMap::COL_ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(UserTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`id`';
-        }
-        if ($this->isColumnModified(UserTableMap::COL_UUID)) {
-            $modifiedColumns[':p' . $index++]  = '`uuid`';
-        }
-        if ($this->isColumnModified(UserTableMap::COL_EMAIL)) {
+        if ($this->isColumnModified(ResetTokenTableMap::COL_EMAIL)) {
             $modifiedColumns[':p' . $index++]  = '`email`';
         }
-        if ($this->isColumnModified(UserTableMap::COL_PASSWORD)) {
-            $modifiedColumns[':p' . $index++]  = '`password`';
+        if ($this->isColumnModified(ResetTokenTableMap::COL_TOKEN)) {
+            $modifiedColumns[':p' . $index++]  = '`token`';
         }
-        if ($this->isColumnModified(UserTableMap::COL_API_TOKEN)) {
-            $modifiedColumns[':p' . $index++]  = '`api_token`';
-        }
-        if ($this->isColumnModified(UserTableMap::COL_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`created_at`';
-        }
-        if ($this->isColumnModified(UserTableMap::COL_UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`updated_at`';
+        if ($this->isColumnModified(ResetTokenTableMap::COL_EXPIRED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`expired_at`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `users` (%s) VALUES (%s)',
+            'INSERT INTO `reset_tokens` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -876,26 +687,14 @@ abstract class User implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`id`':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
-                    case '`uuid`':
-                        $stmt->bindValue($identifier, $this->uuid, PDO::PARAM_STR);
-                        break;
                     case '`email`':
                         $stmt->bindValue($identifier, $this->email, PDO::PARAM_STR);
                         break;
-                    case '`password`':
-                        $stmt->bindValue($identifier, $this->password, PDO::PARAM_STR);
+                    case '`token`':
+                        $stmt->bindValue($identifier, $this->token, PDO::PARAM_STR);
                         break;
-                    case '`api_token`':
-                        $stmt->bindValue($identifier, $this->api_token, PDO::PARAM_STR);
-                        break;
-                    case '`created_at`':
-                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
-                        break;
-                    case '`updated_at`':
-                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                    case '`expired_at`':
+                        $stmt->bindValue($identifier, $this->expired_at ? $this->expired_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -904,13 +703,6 @@ abstract class User implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', 0, $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -943,7 +735,7 @@ abstract class User implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = UserTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ResetTokenTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -960,25 +752,13 @@ abstract class User implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
-                return $this->getUuid();
-                break;
-            case 2:
                 return $this->getEmail();
                 break;
-            case 3:
-                return $this->getPassword();
+            case 1:
+                return $this->getToken();
                 break;
-            case 4:
-                return $this->getApiToken();
-                break;
-            case 5:
-                return $this->getCreatedAt();
-                break;
-            case 6:
-                return $this->getUpdatedAt();
+            case 2:
+                return $this->getExpiredAt();
                 break;
             default:
                 return null;
@@ -1003,26 +783,18 @@ abstract class User implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
     {
 
-        if (isset($alreadyDumpedObjects['User'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['ResetToken'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['User'][$this->hashCode()] = true;
-        $keys = UserTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ResetToken'][$this->hashCode()] = true;
+        $keys = ResetTokenTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getUuid(),
-            $keys[2] => $this->getEmail(),
-            $keys[3] => $this->getPassword(),
-            $keys[4] => $this->getApiToken(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[0] => $this->getEmail(),
+            $keys[1] => $this->getToken(),
+            $keys[2] => $this->getExpiredAt(),
         );
-        if ($result[$keys[5]] instanceof \DateTimeInterface) {
-            $result[$keys[5]] = $result[$keys[5]]->format('c');
-        }
-
-        if ($result[$keys[6]] instanceof \DateTimeInterface) {
-            $result[$keys[6]] = $result[$keys[6]]->format('c');
+        if ($result[$keys[2]] instanceof \DateTimeInterface) {
+            $result[$keys[2]] = $result[$keys[2]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1043,11 +815,11 @@ abstract class User implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\App\Modules\Auth\Model\User
+     * @return $this|\App\Modules\Auth\Model\ResetToken
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = UserTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ResetTokenTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1058,31 +830,19 @@ abstract class User implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\App\Modules\Auth\Model\User
+     * @return $this|\App\Modules\Auth\Model\ResetToken
      */
     public function setByPosition($pos, $value)
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
-                $this->setUuid($value);
-                break;
-            case 2:
                 $this->setEmail($value);
                 break;
-            case 3:
-                $this->setPassword($value);
+            case 1:
+                $this->setToken($value);
                 break;
-            case 4:
-                $this->setApiToken($value);
-                break;
-            case 5:
-                $this->setCreatedAt($value);
-                break;
-            case 6:
-                $this->setUpdatedAt($value);
+            case 2:
+                $this->setExpiredAt($value);
                 break;
         } // switch()
 
@@ -1108,28 +868,16 @@ abstract class User implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = UserTableMap::getFieldNames($keyType);
+        $keys = ResetTokenTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setId($arr[$keys[0]]);
+            $this->setEmail($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setUuid($arr[$keys[1]]);
+            $this->setToken($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setEmail($arr[$keys[2]]);
-        }
-        if (array_key_exists($keys[3], $arr)) {
-            $this->setPassword($arr[$keys[3]]);
-        }
-        if (array_key_exists($keys[4], $arr)) {
-            $this->setApiToken($arr[$keys[4]]);
-        }
-        if (array_key_exists($keys[5], $arr)) {
-            $this->setCreatedAt($arr[$keys[5]]);
-        }
-        if (array_key_exists($keys[6], $arr)) {
-            $this->setUpdatedAt($arr[$keys[6]]);
+            $this->setExpiredAt($arr[$keys[2]]);
         }
     }
 
@@ -1150,7 +898,7 @@ abstract class User implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\App\Modules\Auth\Model\User The current object, for fluid interface
+     * @return $this|\App\Modules\Auth\Model\ResetToken The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -1170,28 +918,16 @@ abstract class User implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(UserTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ResetTokenTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(UserTableMap::COL_ID)) {
-            $criteria->add(UserTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(ResetTokenTableMap::COL_EMAIL)) {
+            $criteria->add(ResetTokenTableMap::COL_EMAIL, $this->email);
         }
-        if ($this->isColumnModified(UserTableMap::COL_UUID)) {
-            $criteria->add(UserTableMap::COL_UUID, $this->uuid);
+        if ($this->isColumnModified(ResetTokenTableMap::COL_TOKEN)) {
+            $criteria->add(ResetTokenTableMap::COL_TOKEN, $this->token);
         }
-        if ($this->isColumnModified(UserTableMap::COL_EMAIL)) {
-            $criteria->add(UserTableMap::COL_EMAIL, $this->email);
-        }
-        if ($this->isColumnModified(UserTableMap::COL_PASSWORD)) {
-            $criteria->add(UserTableMap::COL_PASSWORD, $this->password);
-        }
-        if ($this->isColumnModified(UserTableMap::COL_API_TOKEN)) {
-            $criteria->add(UserTableMap::COL_API_TOKEN, $this->api_token);
-        }
-        if ($this->isColumnModified(UserTableMap::COL_CREATED_AT)) {
-            $criteria->add(UserTableMap::COL_CREATED_AT, $this->created_at);
-        }
-        if ($this->isColumnModified(UserTableMap::COL_UPDATED_AT)) {
-            $criteria->add(UserTableMap::COL_UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(ResetTokenTableMap::COL_EXPIRED_AT)) {
+            $criteria->add(ResetTokenTableMap::COL_EXPIRED_AT, $this->expired_at);
         }
 
         return $criteria;
@@ -1209,8 +945,9 @@ abstract class User implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildUserQuery::create();
-        $criteria->add(UserTableMap::COL_ID, $this->id);
+        $criteria = ChildResetTokenQuery::create();
+        $criteria->add(ResetTokenTableMap::COL_EMAIL, $this->email);
+        $criteria->add(ResetTokenTableMap::COL_TOKEN, $this->token);
 
         return $criteria;
     }
@@ -1223,7 +960,8 @@ abstract class User implements ActiveRecordInterface
      */
     public function hashCode()
     {
-        $validPk = null !== $this->getId();
+        $validPk = null !== $this->getEmail() &&
+            null !== $this->getToken();
 
         $validPrimaryKeyFKs = 0;
         $primaryKeyFKs = [];
@@ -1238,23 +976,29 @@ abstract class User implements ActiveRecordInterface
     }
 
     /**
-     * Returns the primary key for this object (row).
-     * @return int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        $pks = array();
+        $pks[0] = $this->getEmail();
+        $pks[1] = $this->getToken();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Set the [composite] primary key.
      *
-     * @param       int $key Primary key.
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setId($key);
+        $this->setEmail($keys[0]);
+        $this->setToken($keys[1]);
     }
 
     /**
@@ -1263,7 +1007,7 @@ abstract class User implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-        return null === $this->getId();
+        return (null === $this->getEmail()) && (null === $this->getToken());
     }
 
     /**
@@ -1272,22 +1016,18 @@ abstract class User implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \App\Modules\Auth\Model\User (or compatible) type.
+     * @param      object $copyObj An object of \App\Modules\Auth\Model\ResetToken (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setUuid($this->getUuid());
         $copyObj->setEmail($this->getEmail());
-        $copyObj->setPassword($this->getPassword());
-        $copyObj->setApiToken($this->getApiToken());
-        $copyObj->setCreatedAt($this->getCreatedAt());
-        $copyObj->setUpdatedAt($this->getUpdatedAt());
+        $copyObj->setToken($this->getToken());
+        $copyObj->setExpiredAt($this->getExpiredAt());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1300,7 +1040,7 @@ abstract class User implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \App\Modules\Auth\Model\User Clone of current object.
+     * @return \App\Modules\Auth\Model\ResetToken Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1320,13 +1060,9 @@ abstract class User implements ActiveRecordInterface
      */
     public function clear()
     {
-        $this->id = null;
-        $this->uuid = null;
         $this->email = null;
-        $this->password = null;
-        $this->api_token = null;
-        $this->created_at = null;
-        $this->updated_at = null;
+        $this->token = null;
+        $this->expired_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();
@@ -1356,7 +1092,7 @@ abstract class User implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(UserTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ResetTokenTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**
