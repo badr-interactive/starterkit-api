@@ -43,7 +43,9 @@ class AuthController
         $this->user->setEmail($params['email']);
         $this->user->setPassword($hashedPassword);
         $this->user->setUuid($uuid);
-        $this->user->setCreatedAt(date('Y-m-d H:i:s'));
+
+        $createdAt = new \DateTime();
+        $this->user->setCreatedAt($createdAt->format('Y-m-d H:i:s'));
         $this->user->save();
 
         $responseData = [
@@ -65,6 +67,9 @@ class AuthController
 
         $token = strtoupper(substr(uniqid(), -6));
         $user = UserQuery::create()->findOneByEmail($params['email']);
+        if(!$user) {
+            return $response->withJson(['success' => true], 200);
+        }
         
         $resetToken = ResetTokenQuery::create()->findOneByEmail($params['email']);
         if($resetToken) {
@@ -74,13 +79,49 @@ class AuthController
         $resetToken = new ResetToken();
         $resetToken->setEmail($params['email']);
         $resetToken->setToken($token);
-        $resetToken->setExpiredAt(date('Y-m-d H:i:s'));
+
+        $expiredAt = new \DateTime();
+        $expiredAt->add(new \DateInterval('PT1H'));
+        $resetToken->setExpiredAt($expiredAt->format('Y-m-d H:i:s'));
         $resetToken->save();
         
         $this->smtp->addAddress($params['email']);
         $this->smtp->Body = 'your reset token is <b>' . $token . '</b>';
         if(!$this->smtp->send()) {
             return $response->withJson(['success' => false], 500);
+        }
+
+        return $response->withJson(['success' => true], 200);
+    }
+
+    public function resetPassword(Request $request, Response $response)
+    {
+        $params = $request->getParsedBody();
+        $checklist = ['reset_token', 'password', 'confirmation_password'];
+        if(!$this->validateRequiredParam($checklist, $request)) {
+             return $response->withJson(['success' => false], 400);
+        }
+
+        $resetToken = ResetTokenQuery::create()->findOneByToken($params['reset_token']);
+        if(!$resetToken) {
+            return $response->withJson(['success' => false], 404);
+        }
+
+        $currentDate = new \DateTime();
+        if($currentDate > $resetToken->getExpiredAt()) {
+            $resetToken->delete();
+            return $response->withJson(['success' => false], 404);
+        }
+
+        $user = UserQuery::create()->findOneByEmail($resetToken->getEmail());
+        
+        $hashedPassword = password_hash($params['password'], PASSWORD_BCRYPT);
+        $user->setPassword($hashedPassword);
+        
+        $user->setUpdatedAt($currentDate->format('Y-m-d H:i:s'));
+        
+        if($user->save()) {
+            $resetToken->delete();
         }
 
         return $response->withJson(['success' => true], 200);

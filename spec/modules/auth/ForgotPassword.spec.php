@@ -10,18 +10,18 @@ describe('Forgot Password', function() {
         expect($responseData->success)->toBe(false);
     });
 
-    it('should generate reset token', function() {
-        $mockUser = Phake::mock(App\Modules\Auth\Model\User::class);
-
+    it('should silent fail when email not found', function() {
+        $mockUserQuery = Phake::mock(App\Modules\Auth\Model\UserQuery::class);
+        Phake::when($mockUserQuery)->thenReturn($mockUserQuery);
+        Phake::when($mockUserQuery)->findOneByEmail(Phake::ignoreRemaining())->thenReturn(null);
+        
         $dependencies = [];
-        $dependencies['User'] = function($c) use($mockUser) {
-            return $mockUser;
+        $dependencies['UserQuery'] = function($c) use ($mockUserQuery) {
+            return $mockUserQuery;
         };
 
         $data = ['email' => 'me@example.com'];
         $response = runApp('POST', '/auth/forgot_password', json_encode($data), $dependencies);
-        $responseData = json_decode((string)$response->getBody());
         expect($response->getStatusCode())->toBe(200);
-        expect($responseData->success)->toBe(true);
     });
 });
