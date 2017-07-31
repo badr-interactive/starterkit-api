@@ -9,4 +9,9 @@
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />
     </table>
+    <table name="reset_tokens" phpName="ResetToken" namespace="App\Modules\Auth\Model">
+        <column name="email" type="varchar" size="50" required="true" primaryKey="true" />
+        <column name="token" type="char" size="6" required="true" primaryKey="true" />
+        <column name="expired_at" type="timestamp" required="true" />
+    </table>
 </database>

@@ -19,10 +19,11 @@ return [
 
         // Mail settings
         'mail' => [
-            'host' => 'localhost',
-            'port' => 25,
+            'host' => 'mailhog',
+            'port' => 1025,
             'username' => '',
-            'password' => ''
+            'password' => '',
+            'from' => 'no-reply@example.com'
         ],
     ],
 ];

@@ -2,7 +2,7 @@
 
 require __DIR__ . '/../../Base.php';
 
-describe('Auth Controller', function() {
+describe('User Registration', function() {
     it('should reject if does not have email param', function() {
         $data = json_encode([
             'password' => 'secret',
