@@ -47,7 +47,7 @@ class LoginController
                 "name" => $user->getEmail(),
                 "photo" => "https://randomuser.me/api/portraits/men/21.jpg",
                 "email" => $user->getEmail(),
-                "access_token" => "Bearer ".$token,
+                "access_token" => (string) $token,
             ]
         ];
 
