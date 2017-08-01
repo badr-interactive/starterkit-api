@@ -5,7 +5,6 @@
         <column name="uuid" type="varchar" size="36" required="true" />
         <column name="email" type="varchar" size="50" required="true" />
         <column name="password" type="char" size="60" required="true" />
-        <column name="api_token" type="longvarchar" />
         <column name="created_at" type="timestamp" />
         <column name="updated_at" type="timestamp" />
     </table>

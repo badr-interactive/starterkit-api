@@ -42,7 +42,7 @@ class LoginController
             "data" => [
                 "id" => $user->getUuid(),
                 "name" => $user->getEmail(),
-                "photo" => "https://randomuser.me/api/portraits/men/21.jpg",
+                "photo" => $request->getUri()->getBaseUrl() . '/users/' . $user->getUuid() . '/avatar/',
                 "email" => $user->getEmail(),
                 "access_token" => (string) $token,
             ]
