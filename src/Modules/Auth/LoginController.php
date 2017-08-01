@@ -6,6 +6,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Modules\Auth\Model\User;
 use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Signer\Keychain;
+use Lcobucci\JWT\Signer\Rsa\Sha256;
 
 class LoginController
 {
@@ -33,12 +35,7 @@ class LoginController
             return $response->withJson(['success' => false], 400);            
         }
         
-        $salt = $this->random();
-        $token = $this->getToken($request, $user, $salt);
-        if (!$this->saveSalt($user, $salt)) {
-            return $response->withJson(['success' => false], 400);            
-        }
-
+        $token = $this->getToken($request, $user);
         $responseData = [
             "success" => true,
             "message" => "you are successfully logged in",
@@ -91,43 +88,19 @@ class LoginController
         return $user;
     }
 
-    private function random($length = 16)
+    private function getToken($request, $user)
     {
-        $string = '';
-
-        while (($len = strlen($string)) < $length) {
-            $size = $length - $len;
-
-            $bytes = random_bytes($size);
-
-            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
-        }
-
-        return $string;
-    }
-
-    private function getToken($request, $user, $salt)
-    {
+        $signer = new Sha256();
+        $keychain = new Keychain();
         $token = (new Builder())->setIssuer($request->getUri()) // Configures the issuer (iss claim)
                         ->setAudience($request->getUri()) // Configures the audience (aud claim)
-                        ->setId($salt, true) // Configures the id (jti claim), replicating as a header item
                         ->setIssuedAt(time()) // Configures the time that the token was issue (iat claim)
                         ->setNotBefore(time() + 60) // Configures the time that the token can be used (nbf claim)
                         ->setExpiration(time() + 3600) // Configures the expiration time of the token (nbf claim)
                         ->set('uuid', $user->getUuid()) // Configures a new claim, called "uid"
+                        ->sign($signer, $keychain->getPrivateKey('file://' . __DIR__ . '/key.pem')) 
                         ->getToken(); // Retrieves the generated token
 
         return $token;
     }
-
-    private function saveSalt($user, $salt)
-    {
-        $user->setApiToken($salt);
-        if (!$user->save()) {
-            return false;
-        }
-
-        return true;
-    }
-
 }

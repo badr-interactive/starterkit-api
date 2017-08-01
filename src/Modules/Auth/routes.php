@@ -6,3 +6,4 @@ $app->post('/auth/reset_password', '\App\Modules\Auth\AuthController:resetPasswo
 
 $app->post('/auth/login', '\App\Modules\Auth\LoginController:login');
 $app->post('/auth/logout', '\App\Modules\Auth\LogoutController:logout');
+$app->post('/auth/social_login', '\App\Modules\Auth\SocialLoginController:login');
