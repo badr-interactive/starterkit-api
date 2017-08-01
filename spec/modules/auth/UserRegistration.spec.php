@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../../Base.php';
+require_once __DIR__ . '/../../Base.php';
 
 describe('User Registration', function() {
     it('should reject if does not have email param', function() {
