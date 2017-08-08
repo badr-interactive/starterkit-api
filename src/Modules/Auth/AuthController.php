@@ -9,19 +9,16 @@ use App\Modules\Auth\Model\User;
 use App\Modules\Auth\Model\UserQuery;
 use App\Modules\Auth\Model\ResetToken;
 use App\Modules\Auth\Model\ResetTokenQuery;
+use App\Core\Services\Mail\SMTPService;
 use Ramsey\Uuid\Uuid;
 
 class AuthController
 {
-    function __construct(Container $container)
+    function __construct(User $user, UserQuery $userQuery, SMTPService $smtp)
     {
-        if($container->has('User')) {
-            $this->user = $container->get('User');
-        }
-
-        if($container->has('SMTPService')) {
-            $this->smtp = $container->get('SMTPService');
-        }
+        $this->user = $user;
+        $this->userQuery = $userQuery;
+        $this->smtp = $smtp;
     }
 
     public function register(Request $request, Response $response)
@@ -88,7 +85,14 @@ class AuthController
         $this->smtp->addAddress($params['email']);
         $this->smtp->Body = 'your reset token is <b>' . $token . '</b>';
         if(!$this->smtp->send()) {
-            return $response->withJson(['success' => false], 500);
+            //TODO: Define error code
+            return $response->withJson([
+                'success' => false,
+                'error' => [
+                    'code' => '0000',
+                    'message' => $this->smtp->ErrorInfo
+                ]
+            ], 500);
         }
 
         return $response->withJson(['success' => true], 200);
