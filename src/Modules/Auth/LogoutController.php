@@ -6,18 +6,20 @@ use Slim\Container;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Modules\Auth\Model\User;
+use App\Modules\Auth\Model\UserQuery;
+use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\Signer\Keychain;
+use Lcobucci\JWT\Signer\Rsa\Sha256;
+use RuntimeException;
+
 
 class LogoutController
 {
-    function __construct(Container $container)
+    function __construct(User $user, UserQuery $userQuery)
     {
-        if ($container->has('UserQuery')) {
-            $this->userModel = $container->get('UserQuery');
-        }
-
-        if ($container->has('auth')) {
-            $this->auth = $container->get('auth');
-        }
+        $this->user = $user;
+        $this->userQuery = $userQuery;
     }
 
     public function logout(Request $request, Response $response)
@@ -28,11 +30,15 @@ class LogoutController
         }
 
         try {
-            $user = $this->auth;
-            $user->setApiToken(null);
-            $user->save();
-
-        } catch (Exception $e) {
+            $authToken = $request->getHeaderLine('Authorization');
+            $jwt = (new Parser())->parse((string) $authToken);
+            $signer = new SHA256();
+            $keychain = new KeyChain();
+            $isValid = $jwt->verify($signer, $keychain->getPublicKey('file://' . __DIR__ . '/key.pub'));
+            if(!$isValid) {
+                return $response->withJson(['success' => false], 401);
+            }
+        } catch(RuntimeException $e) {
             return $response->withJson(['success' => false], 400);
         }
 

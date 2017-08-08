@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2b9696fcd7b83f4770ce49377b66ef35",
-    "content-hash": "a9169cbff51233262bc850c504a17ee9",
+    "hash": "fe1af911cf1ad4659d1057598055986b",
+    "content-hash": "5526f51d2fab38f36c8e147cbd487dfd",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -406,6 +406,42 @@
                 "reflection"
             ],
             "time": "2015-11-29 10:34:25"
+        },
+        {
+            "name": "php-di/slim-bridge",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHP-DI/Slim-Bridge.git",
+                "reference": "075f9c5b3dc3f4a27a4502025cd138b79a04e18b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHP-DI/Slim-Bridge/zipball/075f9c5b3dc3f4a27a4502025cd138b79a04e18b",
+                "reference": "075f9c5b3dc3f4a27a4502025cd138b79a04e18b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~5.5|~7.0",
+                "php-di/invoker": "^1.2.0",
+                "php-di/php-di": "^5.2.0",
+                "slim/slim": "^3.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DI\\Bridge\\Slim\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP-DI integration in Slim",
+            "time": "2016-09-02 22:21:13"
         },
         {
             "name": "phpmailer/phpmailer",

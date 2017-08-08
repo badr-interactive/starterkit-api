@@ -2,7 +2,7 @@
 
 namespace App\Core\Services\Mail;
 
-use Slim\Container;
+use DI\Container;
 
 class SMTPService extends \PHPMailer
 {
@@ -13,14 +13,13 @@ class SMTPService extends \PHPMailer
     function __construct(Container $container)
     {
         parent::__construct();
-        $settings = $container->get('settings')['mail'];
 
         $this->isSMTP();
-        $this->Host = $settings['host'];
-        $this->Port = $settings['port'];
-        $this->SMTPAuth = true;
-        $this->Username = $settings['username'];
-        $this->Password = $settings['password'];
-        $this->From = $settings['from'];
+        $this->Host = $container->get('settings.mail.host');
+        $this->Port = $container->get('settings.mail.port');
+        $this->SMTPAuth = $container->get('settings.mail.enableAuth');;
+        $this->Username = $container->get('settings.mail.username');
+        $this->Password = $container->get('settings.mail.password');
+        $this->From = $container->get('settings.mail.sender');
     }
 }

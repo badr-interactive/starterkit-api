@@ -4,18 +4,18 @@ namespace App\Modules\Auth;
 use Slim\Container;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use App\Modules\Auth\Model\User;
+use App\Modules\Auth\Model\User as User;
+use App\Modules\Auth\Model\UserQuery as UserQuery;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Keychain;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 
 class LoginController
 {
-    function __construct(Container $container)
+    function __construct(UserQuery $userQuery, User $user)
     {
-        if ($container->has('UserQuery')) {
-            $this->userModel = $container->get('UserQuery');
-        }
+        $this->userQuery = $userQuery;
+        $this->user = $user;
     }
 
     public function login(Request $request, Response $response)
@@ -70,10 +70,9 @@ class LoginController
     private function validateUser($params)
     {
         $email = $params['email'];
-        $user = $this->userModel
+        $user = $this->userQuery
                     ->create()
-                    ->filterByEmail($email)
-                    ;
+                    ->filterByEmail($email);
 
         if ($user->count() < 1) {
             return false;
