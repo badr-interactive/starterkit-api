@@ -34,7 +34,7 @@ class LogoutController
             $jwt = (new Parser())->parse((string) $authToken);
             $signer = new SHA256();
             $keychain = new KeyChain();
-            $isValid = $jwt->verify($signer, $keychain->getPublicKey('file://' . __DIR__ . '/key.pub'));
+            $isValid = $jwt->verify($signer, $keychain->getPublicKey('file://' . __DIR__ . '/../../../key.pub'));
             if(!$isValid) {
                 return $response->withJson(['success' => false], 401);
             }

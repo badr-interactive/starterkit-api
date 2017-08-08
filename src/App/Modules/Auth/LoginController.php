@@ -97,7 +97,7 @@ class LoginController
                         ->setNotBefore(time() + 60) // Configures the time that the token can be used (nbf claim)
                         ->setExpiration(time() + 3600) // Configures the expiration time of the token (nbf claim)
                         ->set('uuid', $user->getUuid()) // Configures a new claim, called "uid"
-                        ->sign($signer, $keychain->getPrivateKey('file://' . __DIR__ . '/key.pem')) 
+                        ->sign($signer, $keychain->getPrivateKey('file://' . __DIR__ . '/../../../key.pem')) 
                         ->getToken(); // Retrieves the generated token
 
         return $token;

@@ -17,5 +17,12 @@ return [
     'settings.mail.enableAuth' => true,
     'settings.mail.username' => '',
     'settings.mail.password' => '',
-    'settings.mail.sender' => 'no-reply@example.com'
+    'settings.mail.sender' => 'no-reply@example.com',
+
+    // DB Settings
+    'settings.db.host' => 'mysql',
+    'settings.db.port' => '3306',
+    'settings.db.user' => 'root',
+    'settings.db.password' => 's3cr3t',
+    'settings.db.database' => 'freedom'
 ];
