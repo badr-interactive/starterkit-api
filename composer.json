@@ -30,8 +30,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\": "src/",
-            "Spec\\": "spec/"
+            "App\\": "src/App"
         }
     },
 	"scripts": {

@@ -17,17 +17,11 @@ session_start();
 // Instantiate the app
 $app = new \App\Core\FreedomApp();
 
-// Set up dependencies
-require __DIR__ . '/../src/dependencies.php';
-
-// Register middleware
-require __DIR__ . '/../src/middleware.php';
-
-// Register routes
-require __DIR__ . '/../src/routes.php';
-
 // Propel configuration
-require __DIR__ . '/../src/connection.php';
+$serviceContainer = \Propel\Runtime\Propel::getServiceContainer();
+$serviceContainer->checkVersion('2.0.0-dev');
+$serviceContainer->setAdapterClass('starterkit', 'mysql');
+$manager = new \Propel\Runtime\Connection\ConnectionManagerSingle();
 
 // Run app
 $app->run();

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<database name="starterkit" defaultIdMethod="native" identifierQuoting="true">
+<database name="freedom" defaultIdMethod="native" identifierQuoting="true">
     <table name="users" phpName="User" namespace="App\Modules\Auth\Model">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="uuid" type="varchar" size="36" required="true" />

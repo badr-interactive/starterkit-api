@@ -54,7 +54,7 @@ if(!file_exists(__DIR__ . '/tmp')) {
     mkdir(__DIR__ . '/tmp', 0755, true);
 }
 
-$modulesDir = __DIR__ . '/src/modules/';
+$modulesDir = __DIR__ . '/src/App/Modules/';
 $files = scandir($modulesDir);
 foreach($files as $key => $value) {
     if($value == '.' || $value == '..') {
@@ -79,14 +79,8 @@ foreach($files as $key => $value) {
     }
 }
 
-print "[Freedom:migrate] Generating SQL file... \n";
-exec('"'.__DIR__ . '/vendor/bin/propel" sql:build --schema-dir tmp/');
-
 print "[Freedom:migrate] Generating database models... \n";
-exec('"'.__DIR__ . '/vendor/bin/propel" model:build --schema-dir tmp/');
-
-print "[Freedom:migrate] Generating connection configuration... \n";
-exec('"'.__DIR__ . '/vendor/bin/propel" config:convert --output-dir src/ --output-file=connection.php');
+exec('"'.__DIR__ . '/vendor/bin/propel" model:build --schema-dir tmp/ --config-dir src/App/Core');
 
 print "[Freedom:migrate] Copying models into app modules... \n";
 $generatedModelDir = __DIR__ . '/generated-classes/App/Modules';
@@ -97,7 +91,7 @@ foreach($files as $key => $value) {
     }
 
     $src = $generatedModelDir . '/' . $value . '/Model';
-    $dest = __DIR__ . '/src/Modules/' . $value . '/Model';
+    $dest = __DIR__ . '/src/App/Modules/' . $value . '/Model';
     if(!file_exists($dest)) {
         mkdir($dest);
     }
@@ -105,8 +99,8 @@ foreach($files as $key => $value) {
 }
 
 print "[Freedom:migrate] Migrating models into databse...\n";
-exec('"'.__DIR__ . '/vendor/bin/propel" diff --schema-dir tmp/');
-exec('"'.__DIR__ . '/vendor/bin/propel" migrate');
+exec('"'.__DIR__ . '/vendor/bin/propel" diff --schema-dir tmp/ --config-dir src/App/Core');
+exec('"'.__DIR__ . '/vendor/bin/propel" migrate --config-dir src/App/Core');
 
 print "[Freedom:migrate] Cleaning up...\n";
 exec('rm -rf "' . __DIR__ . '/generated-classes"');

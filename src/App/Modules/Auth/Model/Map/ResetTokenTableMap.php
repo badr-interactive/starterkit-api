@@ -39,7 +39,7 @@ class ResetTokenTableMap extends TableMap
     /**
      * The default database name for this class
      */
-    const DATABASE_NAME = 'starterkit';
+    const DATABASE_NAME = 'freedom';
 
     /**
      * The table name for this class
