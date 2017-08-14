@@ -20,9 +20,13 @@ return [
     'settings.mail.sender' => 'no-reply@example.com',
 
     // DB Settings
-    'settings.db.host' => 'mysql',
-    'settings.db.port' => '3306',
+    'settings.db.host' => 'localhost',
+    'settings.db.port' => '6666',
     'settings.db.user' => 'root',
     'settings.db.password' => 's3cr3t',
-    'settings.db.database' => 'freedom'
+    'settings.db.database' => 'freedom',
+
+    // Social login
+    'settings.google.clientId' => '875795012172-nnmtsf5lqgfqjaud4uq2h428rj3t2ojl.apps.googleusercontent.com',
+    'settings.facebook.clientId' => ''
 ];

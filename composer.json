@@ -21,7 +21,8 @@
         "ramsey/uuid": "^3.6",
         "phpmailer/phpmailer": "^5.2",
         "lcobucci/jwt": "^3.2",
-        "php-di/slim-bridge": "^1.0"
+        "php-di/slim-bridge": "^1.0",
+        "google/apiclient": "^2.2"
     },
     "require-dev": {
         "phpunit/phpunit": ">=4.8 < 6.0",
