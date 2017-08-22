@@ -20,8 +20,8 @@ return [
     'settings.mail.sender' => 'no-reply@example.com',
 
     // DB Settings
-    'settings.db.host' => 'localhost',
-    'settings.db.port' => '6666',
+    'settings.db.host' => 'mysql',
+    'settings.db.port' => '3306',
     'settings.db.user' => 'root',
     'settings.db.password' => 's3cr3t',
     'settings.db.database' => 'freedom',

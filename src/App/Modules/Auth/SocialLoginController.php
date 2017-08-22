@@ -38,19 +38,19 @@ class SocialLoginController
         if($provider === 'google') {
             $clientId = $this->container->get('settings.google.clientId');
             $client = new \Google_Client(['client_id' => $clientId]);
-            $payload = $client->verifyIdToken($idToken);   
+            $payload = $client->verifyIdToken($idToken);
 
             if($payload) {
                 $userId = $payload['sub'];
                 $email = $payload['email'];
-                
+
                 $uuid = Uuid::uuid4()->toString();
                 $password = substr(uniqid(), -6);
                 $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
                 $this->user->setEmail($email);
                 $this->user->setPassword($hashedPassword);
                 $this->user->setUuid($uuid);
-                
+
                 $createdAt = new \DateTime();
                 $this->user->setCreatedAt($createdAt->format('Y-m-d H:i:s'));
                 $this->user->save();
@@ -72,7 +72,50 @@ class SocialLoginController
             } else {
                 return $response->withJson(['success' => false], 401);
             }
-        } 
+        } else if($provider === 'facebook') {
+            $accessToken = $params['token'];
+            $fb = new \Facebook\Facebook([
+                'app_id' => '102910203769316', // Replace {app-id} with your app id
+                'app_secret' => 'ec381697de304451fee86d52dfd9cdc0',
+                'default_graph_version' => 'v2.10',
+            ]);
+
+            try {
+                $oAuth2Client = $fb->getOAuth2Client();
+                $tokenMetaData = $oAuth2Client->debugToken($accessToken);
+                $fbResponse = $fb->get('/me?fields=id,name,email', $accessToken);
+                $profile = $fbResponse->getDecodedBody();
+
+                $userId = $profile['id'];
+                $email = $profile['email'];
+                $uuid = Uuid::uuid4()->toString();
+                $password = substr(uniqid(), -6);
+                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+                $this->user->setEmail($email);
+                $this->user->setPassword($hashedPassword);
+                $this->user->setUuid($uuid);
+                $createdAt = new \DateTime();
+                $this->user->setCreatedAt($createdAt->format('Y-m-d H:i:s'));
+                $this->user->save();
+
+                $token = $this->getToken($request, $this->user);
+                $responseData = [
+                    "success" => true,
+                    "message" => "you are successfully logged in",
+                    "data" => [
+                        "id" => $this->user->getUuid(),
+                        "name" => $this->user->getEmail(),
+                        "photo" => $request->getUri()->getBaseUrl() . '/users/' . $this->user->getUuid() . '/avatar/',
+                        "email" => $this->user->getEmail(),
+                        "access_token" => (string) $token,
+                    ]
+                ];
+
+                return $response->withJson($responseData, 200);
+            } catch (\Facebook\Exceptions\FacebookResponseException $e) {
+                return $response->withJson(['success' => false], 401);
+            }
+        }
     }
 
     private function validateRequiredParam($checklist = [], $request)
@@ -101,7 +144,7 @@ class SocialLoginController
                         ->setNotBefore(time() + 60) // Configures the time that the token can be used (nbf claim)
                         ->setExpiration(time() + 3600) // Configures the expiration time of the token (nbf claim)
                         ->set('uuid', $user->getUuid()) // Configures a new claim, called "uid"
-                        ->sign($signer, $keychain->getPrivateKey('file://' . __DIR__ . '/../../../key.pem')) 
+                        ->sign($signer, $keychain->getPrivateKey('file://' . __DIR__ . '/../../../key.pem'))
                         ->getToken(); // Retrieves the generated token
 
         return $token;
