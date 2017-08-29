@@ -17,7 +17,7 @@ class RegistrationService
 
     public function register($email, $password)
     {
-        if($this->query->findOneByEmail($email) !== null) {
+        if($this->isEmailAlreadyRegistered($email)) {
             throw new EmailAlreadyRegisteredException;
         }
 
@@ -30,5 +30,16 @@ class RegistrationService
         $this->user->setPassword($hashedPassword);
         $this->user->setCreatedAt($createdAt->format('Y-m-d H:i:s'));
         $this->user->save();
+
+        return $this->user;
+    }
+
+    public function isEmailAlreadyRegistered($email)
+    {
+        if($this->query->findOneByEmail($email) === null) {
+            return false;
+        }
+
+        return true;
     }
 }

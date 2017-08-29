@@ -28,5 +28,6 @@ return [
 
     // Social login
     'settings.google.clientId' => '875795012172-nnmtsf5lqgfqjaud4uq2h428rj3t2ojl.apps.googleusercontent.com',
-    'settings.facebook.clientId' => ''
+    'settings.facebook.appId' => '102910203769316',
+    'settings.facebook.appSecret' => 'ec381697de304451fee86d52dfd9cdc0'
 ];

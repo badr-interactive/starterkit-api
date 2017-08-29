@@ -4,23 +4,27 @@ namespace App\Modules\Auth;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use App\Modules\Auth\Model\User;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Keychain;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use DI\Container;
 use Ramsey\Uuid\Uuid;
+use App\Modules\Auth\Model\User;
+use App\Modules\Auth\Model\UserQuery;
 use App\Modules\Auth\Services\RegistrationService;
+use App\Modules\Auth\Exceptions\InvalidTokenException;
 
 class SocialLoginController
 {
     function __construct(
         Container $container,
         User $user,
+        UserQuery $userQuery,
         RegistrationService $userRegService)
     {
         $this->container = $container;
         $this->user = $user;
+        $this->userQuery = $userQuery;
         $this->userRegService = $userRegService;
     }
 
@@ -33,87 +37,101 @@ class SocialLoginController
 
         $params = $request->getParsedBody();
         $checklist = ['provider', 'token'];
+
         if(!$this->validateRequiredParam($checklist, $request)) {
             return $response->withJson(['success' => false], 400);
         }
 
-        $provider = $params['provider'];
-        $idToken = $params['token'];
-
-        if($provider === 'google') {
-            try {
-                $clientId = $this->container->get('settings.google.clientId');
-                $client = new \Google_Client(['client_id' => $clientId]);
-                $payload = $client->verifyIdToken($idToken);
-
-                if($payload) {
-                    $email = $payload['email'];
-                    $password = substr(uniqid(), -6);
-
-                    $this->userRegService->register($email, $password);
-
-                    $token = $this->getToken($request, $this->user);
-                    $responseData = [
-                        "success" => true,
-                        "message" => "you are successfully logged in",
-                        "data" => [
-                            "id" => $this->user->getUuid(),
-                            "name" => $this->user->getEmail(),
-                            "photo" => $request->getUri()->getBaseUrl() . '/users/' . $this->user->getUuid() . '/avatar/',
-                            "email" => $this->user->getEmail(),
-                            "access_token" => (string) $token,
-                        ]
-                    ];
-
-                    return $response->withJson($responseData, 200);
-                } else {
-                    return $response->withJson(['success' => false], 401);
-                }
-            } catch (\App\Modules\Auth\Exceptions\EmailAlreadyRegisteredException $e) {
-                return $response->withJson(['success' => false, 'error' => [
-                    'code' => $e->getCode(),
-                    'message' => $e->getMessage()]], 401);
-            }
-        } else if($provider === 'facebook') {
-            $accessToken = $params['token'];
-            $fb = new \Facebook\Facebook([
-                'app_id' => '102910203769316',
-                'app_secret' => 'ec381697de304451fee86d52dfd9cdc0',
-                'default_graph_version' => 'v2.10',
-            ]);
-
-            try {
-                $oAuth2Client = $fb->getOAuth2Client();
-                $tokenMetaData = $oAuth2Client->debugToken($accessToken);
-                $fbResponse = $fb->get('/me?fields=id,name,email', $accessToken);
-                $profile = $fbResponse->getDecodedBody();
-
-                $email = $profile['email'];
-                $password = substr(uniqid(), -6);
-                $this->userRegService->register($email, $password);
-
-                $token = $this->getToken($request, $this->user);
-                $responseData = [
-                    "success" => true,
-                    "message" => "you are successfully logged in",
-                    "data" => [
-                        "id" => $this->user->getUuid(),
-                        "name" => $this->user->getEmail(),
-                        "photo" => $request->getUri()->getBaseUrl() . '/users/' . $this->user->getUuid() . '/avatar/',
-                        "email" => $this->user->getEmail(),
-                        "access_token" => (string) $token,
-                    ]
-                ];
-
+        try {
+            $provider = $params['provider'];
+            $token = $params['token'];
+            if($provider === 'google') {
+                $responseData = $this->handleGoogleLogin($token);
                 return $response->withJson($responseData, 200);
-            } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-                return $response->withJson(['success' => false], 401);
-            } catch (\App\Modules\Auth\Exceptions\EmailAlreadyRegisteredException $e) {
-                return $response->withJson(['success' => false, 'error' => [
+            } else if($provider === 'facebook') {
+                $responseData = $this->handleFacebookLogin($token);
+                return $response->withJson($responseData, 200);
+            }
+        } catch (\App\Modules\Auth\Exceptions\InvalidTokenException $e) {
+            return $response->withJson(['success' => false,
+                'error' => [
                     'code' => $e->getCode(),
                     'message' => $e->getMessage()]], 401);
-            }
         }
+
+        return $response->withJson(['success' => false], 400);
+    }
+
+    private function handleGoogleLogin($token)
+    {
+        $clientId = $this->container->get('settings.google.clientId');
+        $client = new \Google_Client(['client_id' => $clientId]);
+        $payload = $client->verifyIdToken($token);
+
+        if(!$payload) { throw new InvalidTokenException; }
+
+        $email = $payload['email'];
+        $user = $this->userQuery->findOneByEmail($email);
+
+        if($user === null) {
+            $user = $this->userRegService->register($email, $password);
+        }
+
+        $picture = $payload['picture'];
+        $accessToken = $this->getToken($user);
+
+        $responseData = [
+            "success" => true,
+            "message" => "you are successfully logged in",
+            "data" => [
+                "id" => $user->getUuid(),
+                "picture" => $picture,
+                "email" => $user->getEmail(),
+                "access_token" => (string) $accessToken,
+            ]
+        ];
+
+        return $responseData;
+    }
+
+    private function handleFacebookLogin($token)
+    {
+        $fb = new \Facebook\Facebook([
+            'app_id' => $this->container->get('settings.facebook.appId'),
+            'app_secret' => $this->container->get('settings.facebook.appSecret'),
+            'default_graph_version' => 'v2.10',
+        ]);
+
+        $oAuth2Client = $fb->getOAuth2Client();;
+        $tokenMetaData = $oAuth2Client->debugToken($token);
+
+        if(!$tokenMetaData->getIsValid()) { throw new InvalidTokenException; }
+
+        $fbResponse = $fb->get('/me?fields=id,name,email,picture', $token);
+        $profile = $fbResponse->getDecodedBody();
+
+        $email = $profile['email'];
+        $user = $this->userQuery->findOneByEmail($email);
+
+        if($user === null) {
+            $user = $this->userRegService->register($email, $password);
+        }
+
+        $picture = $profile['picture']['data']['url'];
+        $accessToken = $this->getToken($user);
+
+        $responseData = [
+            "success" => true,
+            "message" => "you are successfully logged in",
+            "data" => [
+                "id" => $user->getUuid(),
+                "picture" => $picture,
+                "email" => $user->getEmail(),
+                "access_token" => (string) $accessToken,
+            ]
+        ];
+
+        return $responseData;
     }
 
     private function validateRequiredParam($checklist = [], $request)
@@ -132,18 +150,17 @@ class SocialLoginController
         return true;
     }
 
-    private function getToken($request, $user)
+    private function getToken($user)
     {
         $signer = new Sha256();
         $keychain = new Keychain();
-        $token = (new Builder())->setIssuer($request->getUri()) // Configures the issuer (iss claim)
-                        ->setAudience($request->getUri()) // Configures the audience (aud claim)
-                        ->setIssuedAt(time()) // Configures the time that the token was issue (iat claim)
-                        ->setNotBefore(time() + 60) // Configures the time that the token can be used (nbf claim)
-                        ->setExpiration(time() + 3600) // Configures the expiration time of the token (nbf claim)
-                        ->set('uuid', $user->getUuid()) // Configures a new claim, called "uid"
+        $token = (new Builder())->setIssuer('FREEDOM')
+                        ->setIssuedAt(time())
+                        ->setNotBefore(time() + 60)
+                        ->setExpiration(time() + 3600)
+                        ->set('uuid', $user->getUuid())
                         ->sign($signer, $keychain->getPrivateKey('file://' . __DIR__ . '/../../../key.pem'))
-                        ->getToken(); // Retrieves the generated token
+                        ->getToken();
 
         return $token;
     }

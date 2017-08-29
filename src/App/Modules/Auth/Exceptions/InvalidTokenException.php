@@ -2,12 +2,12 @@
 
 namespace App\Modules\Auth\Exceptions;
 
-class EmailAlreadyRegisteredException extends \Exception
+class InvalidTokenException extends \Exception
 {
     function __construct()
     {
-        $code = 1001;
-        $message = "Email already used";
+        $code = 1002;
+        $message = "Invalid Token";
         parent::__construct($message, $code, null);
     }
 }
