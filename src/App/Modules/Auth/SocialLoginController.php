@@ -10,13 +10,18 @@ use Lcobucci\JWT\Signer\Keychain;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use DI\Container;
 use Ramsey\Uuid\Uuid;
+use App\Modules\Auth\Services\RegistrationService;
 
 class SocialLoginController
 {
-    function __construct(Container $container, User $user)
+    function __construct(
+        Container $container,
+        User $user,
+        RegistrationService $userRegService)
     {
         $this->container = $container;
         $this->user = $user;
+        $this->userRegService = $userRegService;
     }
 
     public function login(Request $request, Response $response)
@@ -36,46 +41,43 @@ class SocialLoginController
         $idToken = $params['token'];
 
         if($provider === 'google') {
-            $clientId = $this->container->get('settings.google.clientId');
-            $client = new \Google_Client(['client_id' => $clientId]);
-            $payload = $client->verifyIdToken($idToken);
+            try {
+                $clientId = $this->container->get('settings.google.clientId');
+                $client = new \Google_Client(['client_id' => $clientId]);
+                $payload = $client->verifyIdToken($idToken);
 
-            if($payload) {
-                $userId = $payload['sub'];
-                $email = $payload['email'];
+                if($payload) {
+                    $email = $payload['email'];
+                    $password = substr(uniqid(), -6);
 
-                $uuid = Uuid::uuid4()->toString();
-                $password = substr(uniqid(), -6);
-                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-                $this->user->setEmail($email);
-                $this->user->setPassword($hashedPassword);
-                $this->user->setUuid($uuid);
+                    $this->userRegService->register($email, $password);
 
-                $createdAt = new \DateTime();
-                $this->user->setCreatedAt($createdAt->format('Y-m-d H:i:s'));
-                $this->user->save();
+                    $token = $this->getToken($request, $this->user);
+                    $responseData = [
+                        "success" => true,
+                        "message" => "you are successfully logged in",
+                        "data" => [
+                            "id" => $this->user->getUuid(),
+                            "name" => $this->user->getEmail(),
+                            "photo" => $request->getUri()->getBaseUrl() . '/users/' . $this->user->getUuid() . '/avatar/',
+                            "email" => $this->user->getEmail(),
+                            "access_token" => (string) $token,
+                        ]
+                    ];
 
-                $token = $this->getToken($request, $this->user);
-                $responseData = [
-                    "success" => true,
-                    "message" => "you are successfully logged in",
-                    "data" => [
-                        "id" => $this->user->getUuid(),
-                        "name" => $this->user->getEmail(),
-                        "photo" => $request->getUri()->getBaseUrl() . '/users/' . $this->user->getUuid() . '/avatar/',
-                        "email" => $this->user->getEmail(),
-                        "access_token" => (string) $token,
-                    ]
-                ];
-
-                return $response->withJson($responseData, 200);
-            } else {
-                return $response->withJson(['success' => false], 401);
+                    return $response->withJson($responseData, 200);
+                } else {
+                    return $response->withJson(['success' => false], 401);
+                }
+            } catch (\App\Modules\Auth\Exceptions\EmailAlreadyRegisteredException $e) {
+                return $response->withJson(['success' => false, 'error' => [
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage()]], 401);
             }
         } else if($provider === 'facebook') {
             $accessToken = $params['token'];
             $fb = new \Facebook\Facebook([
-                'app_id' => '102910203769316', // Replace {app-id} with your app id
+                'app_id' => '102910203769316',
                 'app_secret' => 'ec381697de304451fee86d52dfd9cdc0',
                 'default_graph_version' => 'v2.10',
             ]);
@@ -86,17 +88,9 @@ class SocialLoginController
                 $fbResponse = $fb->get('/me?fields=id,name,email', $accessToken);
                 $profile = $fbResponse->getDecodedBody();
 
-                $userId = $profile['id'];
                 $email = $profile['email'];
-                $uuid = Uuid::uuid4()->toString();
                 $password = substr(uniqid(), -6);
-                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-                $this->user->setEmail($email);
-                $this->user->setPassword($hashedPassword);
-                $this->user->setUuid($uuid);
-                $createdAt = new \DateTime();
-                $this->user->setCreatedAt($createdAt->format('Y-m-d H:i:s'));
-                $this->user->save();
+                $this->userRegService->register($email, $password);
 
                 $token = $this->getToken($request, $this->user);
                 $responseData = [
@@ -114,6 +108,10 @@ class SocialLoginController
                 return $response->withJson($responseData, 200);
             } catch (\Facebook\Exceptions\FacebookResponseException $e) {
                 return $response->withJson(['success' => false], 401);
+            } catch (\App\Modules\Auth\Exceptions\EmailAlreadyRegisteredException $e) {
+                return $response->withJson(['success' => false, 'error' => [
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage()]], 401);
             }
         }
     }
