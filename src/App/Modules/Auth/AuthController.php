@@ -9,16 +9,23 @@ use App\Modules\Auth\Model\User;
 use App\Modules\Auth\Model\UserQuery;
 use App\Modules\Auth\Model\ResetToken;
 use App\Modules\Auth\Model\ResetTokenQuery;
+use App\Modules\Auth\Services\UserRegistrationService;
+use App\Modules\Auth\Exceptions\EmailAlreadyRegisteredException;
 use App\Core\Services\Mail\SMTPService;
 use Ramsey\Uuid\Uuid;
 
 class AuthController
 {
-    function __construct(User $user, UserQuery $userQuery, SMTPService $smtp)
+    function __construct(
+        User $user,
+        UserQuery $userQuery,
+        SMTPService $smtp,
+        UserRegistrationService $userRegService)
     {
         $this->user = $user;
         $this->userQuery = $userQuery;
         $this->smtp = $smtp;
+        $this->userRegService = $userRegService;
     }
 
     public function register(Request $request, Response $response)
@@ -29,16 +36,16 @@ class AuthController
             return $response->withJson(['success' => false], 400);
         }
 
-        // TODO: Inject models using DI?
-        $uuid = Uuid::uuid4()->toString();
-        $hashedPassword = password_hash($params['password'], PASSWORD_BCRYPT);
-        $this->user->setEmail($params['email']);
-        $this->user->setPassword($hashedPassword);
-        $this->user->setUuid($uuid);
-
-        $createdAt = new \DateTime();
-        $this->user->setCreatedAt($createdAt->format('Y-m-d H:i:s'));
-        $this->user->save();
+        try {
+            $email = $params['email'];
+            $password = $params['password'];
+            $this->userRegService->register($email, $password);
+        } catch (EmailAlreadyRegisteredException $e) {
+            return $response->withJson(['success' => false, 'error' => [
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+                ]], 400);
+        }
 
         $responseData = [
             'success' => true,
