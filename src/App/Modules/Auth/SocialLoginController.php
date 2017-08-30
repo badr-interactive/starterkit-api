@@ -30,11 +30,6 @@ class SocialLoginController
 
     public function login(Request $request, Response $response)
     {
-        $contentType = $request->getHeaderLine('Content-Type');
-        if($contentType !== 'application/json') {
-            return $response->withJson(['success' => false], 400);
-        }
-
         $params = $request->getParsedBody();
         $checklist = ['provider', 'token'];
 
@@ -57,6 +52,11 @@ class SocialLoginController
                 'error' => [
                     'code' => $e->getCode(),
                     'message' => $e->getMessage()]], 401);
+        } catch (\Exception $e) {
+            return $response->withJson(['success' => false,
+                'error' => [
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage()]], 500);
         }
 
         return $response->withJson(['success' => false], 400);

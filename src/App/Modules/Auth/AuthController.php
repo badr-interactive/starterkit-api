@@ -23,11 +23,6 @@ class AuthController
 
     public function register(Request $request, Response $response)
     {
-        $contentType = $request->getHeaderLine('Content-Type');
-        if($contentType !== 'application/json') {
-            return $response->withJson(['success' => false], 400);
-        }
-
         $params = $request->getParsedBody();
         $checklist = ['email', 'password', 'confirmation_password'];
         if(!$this->validateRequiredParam($checklist, $request)) {
@@ -67,7 +62,7 @@ class AuthController
         if(!$user) {
             return $response->withJson(['success' => true], 200);
         }
-        
+
         $resetToken = ResetTokenQuery::create()->findOneByEmail($params['email']);
         if($resetToken) {
             $resetToken->delete();
@@ -81,7 +76,7 @@ class AuthController
         $expiredAt->add(new \DateInterval('PT1H'));
         $resetToken->setExpiredAt($expiredAt->format('Y-m-d H:i:s'));
         $resetToken->save();
-        
+
         $this->smtp->addAddress($params['email']);
         $this->smtp->Body = 'your reset token is <b>' . $token . '</b>';
         if(!$this->smtp->send()) {
@@ -118,12 +113,12 @@ class AuthController
         }
 
         $user = UserQuery::create()->findOneByEmail($resetToken->getEmail());
-        
+
         $hashedPassword = password_hash($params['password'], PASSWORD_BCRYPT);
         $user->setPassword($hashedPassword);
-        
+
         $user->setUpdatedAt($currentDate->format('Y-m-d H:i:s'));
-        
+
         if($user->save()) {
             $resetToken->delete();
         }
