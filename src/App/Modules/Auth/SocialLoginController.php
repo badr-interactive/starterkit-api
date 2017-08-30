@@ -47,7 +47,7 @@ class SocialLoginController
                 $responseData = $this->handleFacebookLogin($token);
                 return $response->withJson($responseData, 200);
             }
-        } catch (\App\Modules\Auth\Exceptions\InvalidTokenException $e) {
+        } catch (InvalidTokenException $e) {
             return $response->withJson(['success' => false,
                 'error' => [
                     'code' => $e->getCode(),

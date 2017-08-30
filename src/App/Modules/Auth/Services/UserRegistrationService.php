@@ -7,7 +7,7 @@ use App\Modules\Auth\Model\UserQuery;
 use App\Modules\Auth\Exceptions\EmailAlreadyRegisteredException;
 use Ramsey\Uuid\Uuid;
 
-class RegistrationService
+class UserRegistrationService
 {
     function __construct(User $user, UserQuery $query)
     {
