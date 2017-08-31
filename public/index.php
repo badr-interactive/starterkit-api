@@ -19,11 +19,5 @@ $app = new \App\Core\FreedomApp();
 $app->add(new \App\Core\Middlewares\JSONRequestValidationMiddleware);
 $app->add(new \App\Core\Middlewares\CORSHandlerMiddleware);
 
-// Propel configuration
-$serviceContainer = \Propel\Runtime\Propel::getServiceContainer();
-$serviceContainer->checkVersion('2.0.0-dev');
-$serviceContainer->setAdapterClass('starterkit', 'mysql');
-$manager = new \Propel\Runtime\Connection\ConnectionManagerSingle();
-
 // Run app
 $app->run();
