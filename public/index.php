@@ -17,6 +17,7 @@ session_start();
 // Instantiate the app
 $app = new \App\Core\FreedomApp();
 $app->add(new \App\Core\Middlewares\JSONRequestValidationMiddleware);
+$app->add(new \App\Core\Middlewares\CORSHandlerMiddleware);
 
 // Propel configuration
 $serviceContainer = \Propel\Runtime\Propel::getServiceContainer();
