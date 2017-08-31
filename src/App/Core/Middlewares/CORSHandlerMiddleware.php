@@ -19,8 +19,12 @@ class CORSHandlerMiddleware
             ], 400);
         }
 
+        //if the request is not preflight
+        //continue processing the request and then append
+        //the response with Access-Control-Allow-Origin header
         if(!$request->isOptions()) {
-            return $next($request, $response);
+            $response = $next($request, $response);
+            return $response->withHeader('Access-Control-Allow-Origin', '*');
         }
 
         if(!$request->hasHeader('Access-Control-Request-Method')) {
