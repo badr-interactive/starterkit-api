@@ -12,8 +12,7 @@ class JSONRequestValidationMiddleware
         Response $response, $next)
     {
         $contentType = $request->getContentType();
-        if($contentType !== 'application/json' ||
-            $contentType !== 'application/json; charset=utf-8') {
+        if(strpos($contentType, 'application/json')) {
             return $response->withJson(['success' => false], 400);
         }
 
