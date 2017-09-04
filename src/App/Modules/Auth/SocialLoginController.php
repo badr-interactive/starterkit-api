@@ -11,7 +11,7 @@ use DI\Container;
 use Ramsey\Uuid\Uuid;
 use App\Modules\Auth\Model\User;
 use App\Modules\Auth\Model\UserQuery;
-use App\Modules\Auth\Services\RegistrationService;
+use App\Modules\Auth\Services\UserRegistrationService;
 use App\Modules\Auth\Exceptions\InvalidTokenException;
 
 class SocialLoginController
@@ -20,7 +20,7 @@ class SocialLoginController
         Container $container,
         User $user,
         UserQuery $userQuery,
-        RegistrationService $userRegService)
+        UserRegistrationService $userRegService)
     {
         $this->container = $container;
         $this->user = $user;
