@@ -9,13 +9,18 @@ use App\Modules\Auth\Model\UserQuery as UserQuery;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Keychain;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Psr\Log\LoggerInterface as Logger;
 
 class LoginController
 {
-    function __construct(UserQuery $userQuery, User $user)
+    function __construct(
+        UserQuery $userQuery,
+        User $user,
+        Logger $logger)
     {
         $this->userQuery = $userQuery;
         $this->user = $user;
+        $this->logger = $logger;
     }
 
     public function login(Request $request, Response $response)
@@ -43,6 +48,11 @@ class LoginController
             ]
         ];
 
+        $this->logger->info('User has been created', [
+            'uuid' => $user->getUuid(),
+            'email' => $user->getEmail()
+        ]);
+        
         return $response->withJson($responseData, 200);
     }
 

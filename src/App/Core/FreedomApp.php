@@ -18,6 +18,7 @@ class FreedomApp extends \DI\Bridge\Slim\App
     protected function configureContainer(ContainerBuilder $builder)
     {
         $builder->addDefinitions(__DIR__ . '/../../config.php');
+        $builder->addDefinitions(__DIR__ . '/../../dependencies.php');
     }
 
     protected function setupRoute()
@@ -62,9 +63,9 @@ class FreedomApp extends \DI\Bridge\Slim\App
         ));
 
         $manager->setName('freedom');
-        
+
         $serviceContainer = \Propel\Runtime\Propel::getServiceContainer();
-        $serviceContainer->setAdapterClass('freedom', 'mysql'); 
+        $serviceContainer->setAdapterClass('freedom', 'mysql');
         $serviceContainer->setConnectionManager('freedom', $manager);
         $serviceContainer->setDefaultDatasource('freedom');
     }
@@ -80,7 +81,7 @@ class FreedomApp extends \DI\Bridge\Slim\App
             }
 
             $fullpath = $dir . '/' . $value;
-            
+
             if(!is_dir($fullpath)) {
                 continue;
             }
