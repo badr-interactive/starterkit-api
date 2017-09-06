@@ -5,7 +5,7 @@ namespace App\Core\Factories;
 use DI\Container;
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
-use Monolog\Formatter\JSONFormatter;
+use Monolog\Formatter\JsonFormatter;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 class LoggerFactory
@@ -16,7 +16,7 @@ class LoggerFactory
     {
         $logfile = __DIR__ . '/../../../../logs/app.json';
 
-        $formatter = new JSONFormatter();
+        $formatter = new JsonFormatter();
         $handler = new RotatingFileHandler($logfile, self::MAX_LOG_FILE);
         $handler->setFormatter($formatter);
 
