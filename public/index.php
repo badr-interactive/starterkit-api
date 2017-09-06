@@ -18,6 +18,11 @@ session_start();
 $app = new \App\Core\FreedomApp();
 $app->add(new \App\Core\Middlewares\JSONRequestValidationMiddleware);
 $app->add(new \App\Core\Middlewares\CORSHandlerMiddleware);
+$app->add(new \App\Core\Middlewares\HttpLoggingMiddleware);
+
+$checkProxyHeaders = true; // Note: Never trust the IP address for security processes!
+$trustedProxies = ['10.0.0.1', '10.0.0.2']; // Note: Never trust the IP address for security processes!
+$app->add(new RKA\Middleware\IpAddress($checkProxyHeaders, $trustedProxies));
 
 // Run app
 $app->run();

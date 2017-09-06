@@ -6,6 +6,7 @@ use DI\Container;
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Formatter\JSONFormatter;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class LoggerFactory
 {
