@@ -26,20 +26,23 @@ class LogoutController
     {
         $authorization = $request->getHeaderLine('Authorization');
         if(!$authorization) {
-            return $response->withJson(['success' => false], 400);
+            return $response->withJson([
+                'success' => false,
+                'message' => 'no "Authorization" header on request',
+                'data' => null], 400);
         }
 
-        try {
-            $authToken = $request->getHeaderLine('Authorization');
-            $jwt = (new Parser())->parse((string) $authToken);
-            $signer = new SHA256();
-            $keychain = new KeyChain();
-            $isValid = $jwt->verify($signer, $keychain->getPublicKey('file://' . __DIR__ . '/../../../key.pub'));
-            if(!$isValid) {
-                return $response->withJson(['success' => false], 401);
-            }
-        } catch(RuntimeException $e) {
-            return $response->withJson(['success' => false], 400);
+        $authToken = $request->getHeaderLine('Authorization');
+        $jwt = (new Parser())->parse((string) $authToken);
+        $signer = new SHA256();
+        $keychain = new KeyChain();
+        $isValid = $jwt->verify($signer, $keychain->getPublicKey('file://' . __DIR__ . '/../../../key.pub'));
+
+        if(!$isValid) {
+            return $response->withJson([
+                'success' => false,
+                'message' => 'invalid access token',
+                'data' => null], 401);
         }
 
         $responseData = [

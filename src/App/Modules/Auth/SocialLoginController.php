@@ -37,26 +37,14 @@ class SocialLoginController
             return $response->withJson(['success' => false], 400);
         }
 
-        try {
-            $provider = $params['provider'];
-            $token = $params['token'];
-            if($provider === 'google') {
-                $responseData = $this->handleGoogleLogin($token);
-                return $response->withJson($responseData, 200);
-            } else if($provider === 'facebook') {
-                $responseData = $this->handleFacebookLogin($token);
-                return $response->withJson($responseData, 200);
-            }
-        } catch (InvalidTokenException $e) {
-            return $response->withJson(['success' => false,
-                'error' => [
-                    'code' => $e->getCode(),
-                    'message' => $e->getMessage()]], 401);
-        } catch (\Exception $e) {
-            return $response->withJson(['success' => false,
-                'error' => [
-                    'code' => $e->getCode(),
-                    'message' => $e->getMessage()]], 500);
+        $provider = $params['provider'];
+        $token = $params['token'];
+        if($provider === 'google') {
+            $responseData = $this->handleGoogleLogin($token);
+            return $response->withJson($responseData, 200);
+        } else if($provider === 'facebook') {
+            $responseData = $this->handleFacebookLogin($token);
+            return $response->withJson($responseData, 200);
         }
 
         return $response->withJson(['success' => false], 400);

@@ -28,7 +28,10 @@ class LoginController
 
         $params = $request->getParsedBody();
         if (!$user = $this->validateUser($params)) {
-            return $response->withJson(['success' => false], 400);
+            return $response->withJson([
+                'success' => false,
+                'message' => 'invalid username / email or password',
+                'data' => null], 401);
         }
 
         $token = $this->getToken($request, $user);

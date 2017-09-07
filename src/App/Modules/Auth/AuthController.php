@@ -36,16 +36,9 @@ class AuthController
             return $response->withJson(['success' => false], 400);
         }
 
-        try {
-            $email = $params['email'];
-            $password = $params['password'];
-            $this->userRegService->register($email, $password);
-        } catch (EmailAlreadyRegisteredException $e) {
-            return $response->withJson(['success' => false, 'error' => [
-                'code' => $e->getCode(),
-                'message' => $e->getMessage()
-                ]], 400);
-        }
+        $email = $params['email'];
+        $password = $params['password'];
+        $this->userRegService->register($email, $password);
 
         $responseData = [
             'success' => true,
@@ -110,13 +103,19 @@ class AuthController
 
         $resetToken = ResetTokenQuery::create()->findOneByToken($params['reset_token']);
         if(!$resetToken) {
-            return $response->withJson(['success' => false], 404);
+            return $response->withJson([
+                'success' => false,
+                'message' => 'invalid reset token',
+                'data' => null], 400);
         }
 
         $currentDate = new \DateTime();
         if($currentDate > $resetToken->getExpiredAt()) {
             $resetToken->delete();
-            return $response->withJson(['success' => false], 404);
+            return $response->withJson([
+                'success' => false,
+                'message' => 'invalid reset token',
+                'data' => null], 400);
         }
 
         $user = UserQuery::create()->findOneByEmail($resetToken->getEmail());
@@ -130,7 +129,10 @@ class AuthController
             $resetToken->delete();
         }
 
-        return $response->withJson(['success' => true], 200);
+        return $response->withJson([
+            'success' => true,
+            'message' => 'your password has been changed',
+            'data' => null], 200);
     }
 
     private function validateRequiredParam($checklist = [], $request)

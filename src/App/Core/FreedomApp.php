@@ -19,6 +19,9 @@ class FreedomApp extends \DI\Bridge\Slim\App
     {
         $builder->addDefinitions(__DIR__ . '/../../config.php');
         $builder->addDefinitions(__DIR__ . '/../../dependencies.php');
+
+        $callable = function($c) { return new \App\Core\ExceptionHandler; };
+        $builder->addDefinitions(['errorHandler' => $callable]);
     }
 
     protected function setupRoute()
