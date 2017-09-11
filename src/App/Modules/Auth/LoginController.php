@@ -2,6 +2,8 @@
 
 namespace App\Modules\Auth;
 use Slim\Container;
+use App\Core\Validator;
+use App\Core\Exceptions\HttpException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Modules\Auth\Model\User as User;
@@ -21,17 +23,17 @@ class LoginController
 
     public function login(Request $request, Response $response)
     {
-        $checklist = ['email', 'password'];
-        if (!$this->validateRequiredParam($checklist, $request)) {
-            return $response->withJson(['success' => false], 400);
-        }
+        $ruleset = [
+            'email' => 'required | email',
+            'password' => 'required'
+        ];
+
+        $validator = new Validator($request, $ruleset);
+        $validator->validate();
 
         $params = $request->getParsedBody();
         if (!$user = $this->validateUser($params)) {
-            return $response->withJson([
-                'success' => false,
-                'message' => 'invalid username / email or password',
-                'data' => null], 401);
+            throw new HttpException(401, 'invalid user credentials');
         }
 
         $token = $this->getToken($request, $user);

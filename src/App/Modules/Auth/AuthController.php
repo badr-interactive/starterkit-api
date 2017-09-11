@@ -12,6 +12,7 @@ use App\Modules\Auth\Model\ResetTokenQuery;
 use App\Modules\Auth\Services\UserRegistrationService;
 use App\Modules\Auth\Exceptions\EmailAlreadyRegisteredException;
 use App\Core\Services\Mail\SMTPService;
+use App\Core\Validator;
 use Ramsey\Uuid\Uuid;
 
 class AuthController
@@ -30,12 +31,16 @@ class AuthController
 
     public function register(Request $request, Response $response)
     {
-        $params = $request->getParsedBody();
-        $checklist = ['email', 'password', 'confirmation_password'];
-        if(!$this->validateRequiredParam($checklist, $request)) {
-            return $response->withJson(['success' => false], 400);
-        }
+        $ruleset = [
+            'email' => 'required | email',
+            'password' => 'required',
+            'confirmation_password' => 'required'
+        ];
 
+        $validator = new Validator($request, $ruleset);
+        $validator->validate();
+
+        $params = $request->getParsedBody();
         $email = $params['email'];
         $password = $params['password'];
         $this->userRegService->register($email, $password);
@@ -51,12 +56,11 @@ class AuthController
 
     public function forgotPassword(Request $request, Response $response)
     {
-        $params = $request->getParsedBody();
-        $checklist = ['email'];
-        if(!$this->validateRequiredParam($checklist, $request)) {
-            return $response->withJson(['success' => false], 400);
-        }
+        $ruleset = ['email' => 'required | email'];
+        $validator = new Validator($request, $ruleset);
+        $validator->validate();
 
+        $params = $request->getParsedBody();
         $token = strtoupper(substr(uniqid(), -6));
         $user = UserQuery::create()->findOneByEmail($params['email']);
         if(!$user) {
@@ -88,27 +92,24 @@ class AuthController
 
     public function resetPassword(Request $request, Response $response)
     {
-        $params = $request->getParsedBody();
-        $checklist = ['reset_token', 'password', 'confirmation_password'];
-        if(!$this->validateRequiredParam($checklist, $request)) {
-             return $response->withJson(['success' => false], 400);
-        }
+        $ruleset = [
+            'reset_token' => 'required',
+            'password' => 'required',
+            'confirmation_password' => 'required'
+        ];
 
+        $validator = new Validator($request, $ruleset);
+        $validator->validate();
+
+        $params = $request->getParsedBody();
         $resetToken = ResetTokenQuery::create()->findOneByToken($params['reset_token']);
         if(!$resetToken) {
-            return $response->withJson([
-                'success' => false,
-                'message' => 'invalid reset token',
-                'data' => null], 400);
+            throw new HttpException(400, 'invalid reset token');
         }
 
         $currentDate = new \DateTime();
         if($currentDate > $resetToken->getExpiredAt()) {
-            $resetToken->delete();
-            return $response->withJson([
-                'success' => false,
-                'message' => 'invalid reset token',
-                'data' => null], 400);
+            throw new HttpException(400, 'reset token is expired');
         }
 
         $user = UserQuery::create()->findOneByEmail($resetToken->getEmail());
@@ -126,21 +127,5 @@ class AuthController
             'success' => true,
             'message' => 'your password has been changed',
             'data' => null], 200);
-    }
-
-    private function validateRequiredParam($checklist = [], $request)
-    {
-        $params = $request->getParsedBody();
-        if(!$params) {
-            return false;
-        }
-
-        foreach($checklist as $check) {
-            if(!array_key_exists($check, $params)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }
