@@ -80,14 +80,7 @@ class AuthController
         $this->smtp->addAddress($params['email']);
         $this->smtp->Body = 'your reset token is <b>' . $token . '</b>';
         if(!$this->smtp->send()) {
-            //TODO: Define error code
-            return $response->withJson([
-                'success' => false,
-                'error' => [
-                    'code' => '0000',
-                    'message' => $this->smtp->ErrorInfo
-                ]
-            ], 500);
+            throw new \Exception($this->smtp->ErrorInfo);
         }
 
         return $response->withJson(['success' => true], 200);
