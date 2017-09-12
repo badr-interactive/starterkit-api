@@ -12,6 +12,7 @@ use App\Modules\Auth\Model\ResetToken;
 use App\Modules\Auth\Model\ResetTokenQuery;
 use App\Modules\Auth\Services\UserRegistrationService;
 use App\Modules\Auth\Exceptions\EmailAlreadyRegisteredException;
+use App\Core\Exceptions\HttpException;
 use App\Core\Services\Mail\SMTPService;
 use App\Core\Validator;
 use Ramsey\Uuid\Uuid;
