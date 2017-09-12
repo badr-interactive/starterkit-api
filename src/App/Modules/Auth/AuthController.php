@@ -3,6 +3,7 @@
 namespace App\Modules\Auth;
 
 use Slim\Container;
+use Slim\Views\PhpRenderer;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Modules\Auth\Model\User;
@@ -81,8 +82,15 @@ class AuthController
         $resetToken->setExpiredAt($expiredAt->format('Y-m-d H:i:s'));
         $resetToken->save();
 
+        $renderer = new PhpRenderer(__DIR__ . '/resources/mail/');
+        $template = $renderer->render($response, 'reset_password.php', [
+            'token' => $token,
+            'email' => $params['email']
+        ]);
+
         $this->smtp->addAddress($params['email']);
-        $this->smtp->Body = 'your reset token is <b>' . $token . '</b>';
+        $this->smtp->Body = (string)$template->getBody();
+        $this->smtp->isHTML(true);
         if(!$this->smtp->send()) {
             throw new \Exception($this->smtp->ErrorInfo);
         }

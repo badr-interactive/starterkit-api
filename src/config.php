@@ -12,12 +12,12 @@ return [
     'settings.routerCacheFile' => false,
 
     // Mail settings
-    'settings.mail.host' => 'mailhog',
-    'settings.mail.port' => 1025,
+    'settings.mail.host' => 'smtp.mailtrap.io',
+    'settings.mail.port' => 2525,
     'settings.mail.enableAuth' => true,
-    'settings.mail.username' => '',
-    'settings.mail.password' => '',
-    'settings.mail.sender' => 'no-reply@example.com',
+    'settings.mail.username' => '23e9cb4290d03a',
+    'settings.mail.password' => '6b517875957669',
+    'settings.mail.sender' => 'no-reply@dev.badr.co.id',
 
     // DB Settings
     'settings.db.host' => 'mysql',
