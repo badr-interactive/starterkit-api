@@ -40,7 +40,9 @@ class SocialLoginController
         $provider = $params['provider'];
         $token = $params['token'];
         if($provider === 'google') {
-            $responseData = $this->handleGoogleLogin($token);
+            $userAgent = $request->getHeader('User-Agent')[0];
+            $clientId = $this->getGoogleClientId($userAgent);
+            $responseData = $this->handleGoogleLogin($token, $clientId);
             return $response->withJson($responseData, 200);
         } else if($provider === 'facebook') {
             $responseData = $this->handleFacebookLogin($token);
@@ -50,9 +52,8 @@ class SocialLoginController
         return $response->withJson(['success' => false], 400);
     }
 
-    private function handleGoogleLogin($token)
+    private function handleGoogleLogin($token, $clientId)
     {
-        $clientId = $this->container->get('settings.google.clientId');
         $client = new \Google_Client(['client_id' => $clientId]);
         $payload = $client->verifyIdToken($token);
 
@@ -68,6 +69,10 @@ class SocialLoginController
         $picture = $payload['picture'];
         $accessToken = $this->getToken($user);
 
+        $lastLogin = new \DateTime();
+        $user->setLastLogin($lastLogin->format('Y-m-d H:i:s'));
+        $user->save();
+        
         $responseData = [
             "success" => true,
             "message" => "you are successfully logged in",
@@ -80,6 +85,17 @@ class SocialLoginController
         ];
 
         return $responseData;
+    }
+
+    private function getGoogleClientId($userAgent)
+    {
+        if(stripos($userAgent, 'iOS')) {
+            return $this->container->get('settings.google.ios.clientId');
+        } elseif (stripos($userAgent, 'Android')) {
+            return $this->container->get('settings.google.android.clientId');
+        }
+
+        return $this->container->get('settings.google.web.clientId');
     }
 
     private function handleFacebookLogin($token)
@@ -107,6 +123,10 @@ class SocialLoginController
 
         $picture = $profile['picture']['data']['url'];
         $accessToken = $this->getToken($user);
+
+        $lastLogin = new \DateTime();
+        $user->setLastLogin($lastLogin->format('Y-m-d H:i:s'));
+        $user->save();
 
         $responseData = [
             "success" => true,

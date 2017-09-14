@@ -20,14 +20,16 @@ return [
     'settings.mail.sender' => 'no-reply@dev.badr.co.id',
 
     // DB Settings
-    'settings.db.host' => 'mysql',
-    'settings.db.port' => '3306',
+    'settings.db.host' => '192.168.99.100',
+    'settings.db.port' => '6666',
     'settings.db.user' => 'root',
     'settings.db.password' => 's3cr3t',
     'settings.db.database' => 'freedom',
 
     // Social login
-    'settings.google.clientId' => '875795012172-nnmtsf5lqgfqjaud4uq2h428rj3t2ojl.apps.googleusercontent.com',
-    'settings.facebook.appId' => '102910203769316',
-    'settings.facebook.appSecret' => 'ec381697de304451fee86d52dfd9cdc0'
+    'settings.google.web.clientId' => '392223742967-d1ha3fpu60289nlinkvntcp93aubke8a.apps.googleusercontent.com',
+    'settings.google.ios.clientId' => '392223742967-auqrva31v5dltj7k1o49l8bmpk2vav10.apps.googleusercontent.com',
+    'settings.google.android.clientId' => '392223742967-vj98lnqp1as9d13b9tln6fouh903oc71.apps.googleusercontent.com',
+    'settings.facebook.appId' => '106034073373462',
+    'settings.facebook.appSecret' => '54e8843f0fa748ce1668e4615cff0796'
 ];

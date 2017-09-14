@@ -36,6 +36,10 @@ class LoginController
             throw new HttpException(401, 'invalid user credentials');
         }
 
+        $lastLogin = new \DateTime();
+        $user->setLastLogin($lastLogin->format('Y-m-d H:i:s'));
+        $user->save();
+        
         $token = $this->getToken($request, $user);
         $responseData = [
             "success" => true,
