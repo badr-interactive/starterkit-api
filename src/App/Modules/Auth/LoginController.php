@@ -55,7 +55,6 @@ class LoginController
             ]
         ];
 
-        $this->messaging->send('1234', 'Hello World!');
         return $response->withJson($responseData, 200);
     }
 
