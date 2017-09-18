@@ -6,19 +6,21 @@ use App\Core\Validator;
 use App\Core\Exceptions\HttpException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Log\LoggerInterface as Logger;
+use App\Core\Services\Messaging\FirebaseCloudMessaging;
 use App\Modules\Auth\Model\User as User;
 use App\Modules\Auth\Model\UserQuery as UserQuery;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Keychain;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
-use Psr\Log\LoggerInterface as Logger;
 
 class LoginController
 {
-    function __construct( UserQuery $userQuery, User $user)
+    function __construct( UserQuery $userQuery, User $user, FirebaseCloudMessaging $messaging)
     {
         $this->userQuery = $userQuery;
         $this->user = $user;
+        $this->messaging = $messaging;
     }
 
     public function login(Request $request, Response $response)
@@ -39,7 +41,7 @@ class LoginController
         $lastLogin = new \DateTime();
         $user->setLastLogin($lastLogin->format('Y-m-d H:i:s'));
         $user->save();
-        
+
         $token = $this->getToken($request, $user);
         $responseData = [
             "success" => true,
@@ -53,23 +55,8 @@ class LoginController
             ]
         ];
 
+        $this->messaging->send('1234', 'Hello World!');
         return $response->withJson($responseData, 200);
-    }
-
-    private function validateRequiredParam($checklist = [], $request)
-    {
-        $params = $request->getParsedBody();
-        if(!$params) {
-            return false;
-        }
-
-        foreach($checklist as $check) {
-            if(!array_key_exists($check, $params)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private function validateUser($params)

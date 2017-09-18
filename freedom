@@ -54,6 +54,8 @@ if(!file_exists(__DIR__ . '/tmp')) {
     mkdir(__DIR__ . '/tmp', 0755, true);
 }
 
+copy(__DIR__ . '/src/App/Core/schema.xml', __DIR__ . '/tmp/core.schema.xml');
+
 $modulesDir = __DIR__ . '/src/App/Modules/';
 $files = scandir($modulesDir);
 foreach($files as $key => $value) {
@@ -62,7 +64,7 @@ foreach($files as $key => $value) {
     }
 
     $fullpath = $modulesDir . '/' . $value;
-    
+
     if(!is_dir($fullpath)) {
         continue;
     }
@@ -83,6 +85,7 @@ print "[Freedom:migrate] Generating database models... \n";
 exec('"'.__DIR__ . '/vendor/bin/propel" model:build --schema-dir tmp/ --config-dir src/App/Core');
 
 print "[Freedom:migrate] Copying models into app modules... \n";
+xcopy(__DIR__ . '/generated-classes/App/Core/Model', __DIR__ . '/src/App/Core/Model');
 $generatedModelDir = __DIR__ . '/generated-classes/App/Modules';
 $files = scandir($generatedModelDir);
 foreach($files as $key => $value) {

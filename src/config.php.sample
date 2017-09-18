@@ -31,5 +31,6 @@ return [
     'settings.google.ios.clientId' => '392223742967-auqrvxxx.apps.googleusercontent.com',
     'settings.google.android.clientId' => '392223742967-vj98lxxx.apps.googleusercontent.com',
     'settings.facebook.appId' => '10603xxx',
-    'settings.facebook.appSecret' => '54e8843xxx'
+    'settings.facebook.appSecret' => '54e8843xxx',
+    'settings.fcm.serverKey' => 'AAAAW1JbW_c:APA91bFTnHTsUHxxx9GbUyRK_o1la'
 ];

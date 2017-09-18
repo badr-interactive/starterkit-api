@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Modules\Auth\Model\Map;
+namespace App\Core\Model\Map;
 
-use App\Modules\Auth\Model\User;
-use App\Modules\Auth\Model\UserQuery;
+use App\Core\Model\MessageQueue;
+use App\Core\Model\MessageQueueQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'users' table.
+ * This class defines the structure of the 'message_queue' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class UserTableMap extends TableMap
+class MessageQueueTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class UserTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'App.Modules.Auth.Model.Map.UserTableMap';
+    const CLASS_NAME = 'App.Core.Model.Map.MessageQueueTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class UserTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'users';
+    const TABLE_NAME = 'message_queue';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\App\\Modules\\Auth\\Model\\User';
+    const OM_CLASS = '\\App\\Core\\Model\\MessageQueue';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'App.Modules.Auth.Model.User';
+    const CLASS_DEFAULT = 'App.Core.Model.MessageQueue';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -69,42 +69,27 @@ class UserTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'users.id';
+    const COL_ID = 'message_queue.id';
 
     /**
-     * the column name for the uuid field
+     * the column name for the destination field
      */
-    const COL_UUID = 'users.uuid';
+    const COL_DESTINATION = 'message_queue.destination';
 
     /**
-     * the column name for the email field
+     * the column name for the message field
      */
-    const COL_EMAIL = 'users.email';
+    const COL_MESSAGE = 'message_queue.message';
 
     /**
-     * the column name for the password field
+     * the column name for the timestamp field
      */
-    const COL_PASSWORD = 'users.password';
-
-    /**
-     * the column name for the last_login field
-     */
-    const COL_LAST_LOGIN = 'users.last_login';
-
-    /**
-     * the column name for the created_at field
-     */
-    const COL_CREATED_AT = 'users.created_at';
-
-    /**
-     * the column name for the updated_at field
-     */
-    const COL_UPDATED_AT = 'users.updated_at';
+    const COL_TIMESTAMP = 'message_queue.timestamp';
 
     /**
      * The default string format for model objects of the related table
@@ -118,11 +103,11 @@ class UserTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Uuid', 'Email', 'Password', 'LastLogin', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'uuid', 'email', 'password', 'lastLogin', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(UserTableMap::COL_ID, UserTableMap::COL_UUID, UserTableMap::COL_EMAIL, UserTableMap::COL_PASSWORD, UserTableMap::COL_LAST_LOGIN, UserTableMap::COL_CREATED_AT, UserTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'uuid', 'email', 'password', 'last_login', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'Destination', 'Message', 'Timestamp', ),
+        self::TYPE_CAMELNAME     => array('id', 'destination', 'message', 'timestamp', ),
+        self::TYPE_COLNAME       => array(MessageQueueTableMap::COL_ID, MessageQueueTableMap::COL_DESTINATION, MessageQueueTableMap::COL_MESSAGE, MessageQueueTableMap::COL_TIMESTAMP, ),
+        self::TYPE_FIELDNAME     => array('id', 'destination', 'message', 'timestamp', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -132,11 +117,11 @@ class UserTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Uuid' => 1, 'Email' => 2, 'Password' => 3, 'LastLogin' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'uuid' => 1, 'email' => 2, 'password' => 3, 'lastLogin' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(UserTableMap::COL_ID => 0, UserTableMap::COL_UUID => 1, UserTableMap::COL_EMAIL => 2, UserTableMap::COL_PASSWORD => 3, UserTableMap::COL_LAST_LOGIN => 4, UserTableMap::COL_CREATED_AT => 5, UserTableMap::COL_UPDATED_AT => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'uuid' => 1, 'email' => 2, 'password' => 3, 'last_login' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Destination' => 1, 'Message' => 2, 'Timestamp' => 3, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'destination' => 1, 'message' => 2, 'timestamp' => 3, ),
+        self::TYPE_COLNAME       => array(MessageQueueTableMap::COL_ID => 0, MessageQueueTableMap::COL_DESTINATION => 1, MessageQueueTableMap::COL_MESSAGE => 2, MessageQueueTableMap::COL_TIMESTAMP => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'destination' => 1, 'message' => 2, 'timestamp' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -149,20 +134,17 @@ class UserTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('users');
-        $this->setPhpName('User');
+        $this->setName('message_queue');
+        $this->setPhpName('MessageQueue');
         $this->setIdentifierQuoting(true);
-        $this->setClassName('\\App\\Modules\\Auth\\Model\\User');
-        $this->setPackage('App.Modules.Auth.Model');
+        $this->setClassName('\\App\\Core\\Model\\MessageQueue');
+        $this->setPackage('App.Core.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('uuid', 'Uuid', 'VARCHAR', true, 36, null);
-        $this->addColumn('email', 'Email', 'VARCHAR', true, 50, null);
-        $this->addColumn('password', 'Password', 'CHAR', true, 60, null);
-        $this->addColumn('last_login', 'LastLogin', 'TIMESTAMP', false, null, null);
-        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('destination', 'Destination', 'VARCHAR', true, 255, null);
+        $this->addColumn('message', 'Message', 'VARCHAR', true, 255, null);
+        $this->addColumn('timestamp', 'Timestamp', 'TIMESTAMP', true, null, null);
     } // initialize()
 
     /**
@@ -171,19 +153,6 @@ class UserTableMap extends TableMap
     public function buildRelations()
     {
     } // buildRelations()
-
-    /**
-     *
-     * Gets the list of behaviors registered for this table
-     *
-     * @return array Associative array (name => parameters) of behaviors
-     */
-    public function getBehaviors()
-    {
-        return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
-        );
-    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -242,7 +211,7 @@ class UserTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? UserTableMap::CLASS_DEFAULT : UserTableMap::OM_CLASS;
+        return $withPrefix ? MessageQueueTableMap::CLASS_DEFAULT : MessageQueueTableMap::OM_CLASS;
     }
 
     /**
@@ -256,22 +225,22 @@ class UserTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (User object, last column rank)
+     * @return array           (MessageQueue object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = UserTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = UserTableMap::getInstanceFromPool($key))) {
+        $key = MessageQueueTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = MessageQueueTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + UserTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + MessageQueueTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = UserTableMap::OM_CLASS;
-            /** @var User $obj */
+            $cls = MessageQueueTableMap::OM_CLASS;
+            /** @var MessageQueue $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            UserTableMap::addInstanceToPool($obj, $key);
+            MessageQueueTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -294,18 +263,18 @@ class UserTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = UserTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = UserTableMap::getInstanceFromPool($key))) {
+            $key = MessageQueueTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = MessageQueueTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var User $obj */
+                /** @var MessageQueue $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                UserTableMap::addInstanceToPool($obj, $key);
+                MessageQueueTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -326,21 +295,15 @@ class UserTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(UserTableMap::COL_ID);
-            $criteria->addSelectColumn(UserTableMap::COL_UUID);
-            $criteria->addSelectColumn(UserTableMap::COL_EMAIL);
-            $criteria->addSelectColumn(UserTableMap::COL_PASSWORD);
-            $criteria->addSelectColumn(UserTableMap::COL_LAST_LOGIN);
-            $criteria->addSelectColumn(UserTableMap::COL_CREATED_AT);
-            $criteria->addSelectColumn(UserTableMap::COL_UPDATED_AT);
+            $criteria->addSelectColumn(MessageQueueTableMap::COL_ID);
+            $criteria->addSelectColumn(MessageQueueTableMap::COL_DESTINATION);
+            $criteria->addSelectColumn(MessageQueueTableMap::COL_MESSAGE);
+            $criteria->addSelectColumn(MessageQueueTableMap::COL_TIMESTAMP);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.uuid');
-            $criteria->addSelectColumn($alias . '.email');
-            $criteria->addSelectColumn($alias . '.password');
-            $criteria->addSelectColumn($alias . '.last_login');
-            $criteria->addSelectColumn($alias . '.created_at');
-            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.destination');
+            $criteria->addSelectColumn($alias . '.message');
+            $criteria->addSelectColumn($alias . '.timestamp');
         }
     }
 
@@ -353,7 +316,7 @@ class UserTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(UserTableMap::DATABASE_NAME)->getTable(UserTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(MessageQueueTableMap::DATABASE_NAME)->getTable(MessageQueueTableMap::TABLE_NAME);
     }
 
     /**
@@ -361,16 +324,16 @@ class UserTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(UserTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(UserTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new UserTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(MessageQueueTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(MessageQueueTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new MessageQueueTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a User or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a MessageQueue or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or User object or primary key or array of primary keys
+     * @param mixed               $values Criteria or MessageQueue object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -381,27 +344,27 @@ class UserTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(UserTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(MessageQueueTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \App\Modules\Auth\Model\User) { // it's a model object
+        } elseif ($values instanceof \App\Core\Model\MessageQueue) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(UserTableMap::DATABASE_NAME);
-            $criteria->add(UserTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(MessageQueueTableMap::DATABASE_NAME);
+            $criteria->add(MessageQueueTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = UserQuery::create()->mergeWith($criteria);
+        $query = MessageQueueQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            UserTableMap::clearInstancePool();
+            MessageQueueTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                UserTableMap::removeInstanceFromPool($singleval);
+                MessageQueueTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -409,20 +372,20 @@ class UserTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the users table.
+     * Deletes all rows from the message_queue table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return UserQuery::create()->doDeleteAll($con);
+        return MessageQueueQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a User or Criteria object.
+     * Performs an INSERT on the database, given a MessageQueue or Criteria object.
      *
-     * @param mixed               $criteria Criteria or User object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or MessageQueue object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -431,22 +394,22 @@ class UserTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(UserTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(MessageQueueTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from User object
+            $criteria = $criteria->buildCriteria(); // build Criteria from MessageQueue object
         }
 
-        if ($criteria->containsKey(UserTableMap::COL_ID) && $criteria->keyContainsValue(UserTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.UserTableMap::COL_ID.')');
+        if ($criteria->containsKey(MessageQueueTableMap::COL_ID) && $criteria->keyContainsValue(MessageQueueTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.MessageQueueTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = UserQuery::create()->mergeWith($criteria);
+        $query = MessageQueueQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -455,7 +418,7 @@ class UserTableMap extends TableMap
         });
     }
 
-} // UserTableMap
+} // MessageQueueTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-UserTableMap::buildTableMap();
+MessageQueueTableMap::buildTableMap();
